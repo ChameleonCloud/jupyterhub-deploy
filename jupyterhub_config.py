@@ -54,6 +54,7 @@ def pre_spawn_hook(spawner):
 origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
 c.Spawner.pre_spawn_hook = pre_spawn_hook
+c.Spawner.mem_limit = '2G'
 
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = 'hub'
