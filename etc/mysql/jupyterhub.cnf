@@ -1,0 +1,5 @@
+[mysqld]
+# Note: deprecated in MariaDB 10.3 - but needed for 10.2
+innodb_large_prefix
+# Note: deprecated in MariaDB 10.3 - but needed for 10.2
+innodb_file_format=Barracuda
