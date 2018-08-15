@@ -40,6 +40,7 @@ services:
       DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
       MYSQL_HOST: hub-db
     env_file:
+      - secrets/jupyterhub.env
       - secrets/mysql.env
 
   hub-sslproxy:

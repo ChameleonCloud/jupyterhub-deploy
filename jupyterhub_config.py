@@ -6,6 +6,9 @@ import os
 
 c = get_config()
 
+c.Application.log_level = 'DEBUG'
+c.JupyterHub.log_level = 'DEBUG'
+
 # We rely on environment variables to configure JupyterHub so that we
 # avoid having to rebuild the JupyterHub container every time we change a
 # configuration parameter.
@@ -55,6 +58,7 @@ origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
 c.Spawner.pre_spawn_hook = pre_spawn_hook
 c.Spawner.mem_limit = '2G'
+c.Spawner.debug = True
 
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = 'hub'
@@ -65,6 +69,8 @@ c.JupyterHub.bind_url = 'http://:8000'
 # Authenticate users with Keystone
 c.JupyterHub.authenticator_class = 'keystoneauthenticator.KeystoneAuthenticator'
 c.KeystoneAuthenticator.auth_url = 'https://chi.tacc.chameleoncloud.org:5000/v3'
+# KeystoneAuthenticator uses auth_state to store Keystone token information
+c.Authenticator.enable_auth_state = True
 
 # Persist hub data on volume mounted inside container
 data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')

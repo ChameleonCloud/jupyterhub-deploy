@@ -9,15 +9,13 @@ volumes:
 	@docker volume inspect $(DATA_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DATA_VOLUME_HOST)
 	@docker volume inspect $(DB_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DB_VOLUME_HOST)
 
-.PHONY: certs
-certs:
-	openssl dhparam -dsaparam -out secrets/dhparam.pem 2048
+secrets/dhparam.pem:
+	@echo "Generating Diffie-Hellman params in $@"
+	@openssl dhparam -dsaparam -out $@ 2048
 
-userlist:
-	@echo "Add usernames, one per line, to ./userlist, such as:"
-	@echo "    zoe admin"
-	@echo "    wash"
-	@exit 1
+secrets/jupyterhub.env:
+	@echo "Generating JupyterHub encryption keys in $@"
+	@echo "JUPYTERHUB_CRYPT_KEY=$(shell openssl rand -hex 32)" > $@
 
 secrets/mysql.env:
 	@echo "Generating mysql passwords in $@"
@@ -26,8 +24,14 @@ secrets/mysql.env:
 	@echo "MYSQL_PASSWORD=$(shell openssl rand -hex 32)" >> $@
 	@echo "MYSQL_DATABASE=jupyterhub" >> $@
 
+userlist:
+	@echo "Add usernames, one per line, to ./userlist, such as:"
+	@echo "    zoe admin"
+	@echo "    wash"
+	@exit 1
+
 .PHONY: check-files
-check-files: secrets/mysql.env
+check-files: secrets/dhparam.pem secrets/jupyterhub.env secrets/mysql.env userlist
 
 .PHONY: pull
 pull:
@@ -43,3 +47,7 @@ notebook_image: pull singleuser/Dockerfile
 .PHONY: build
 build: check-files network volumes
 	docker-compose build
+
+.PHONY: start
+start:
+	docker-compose up

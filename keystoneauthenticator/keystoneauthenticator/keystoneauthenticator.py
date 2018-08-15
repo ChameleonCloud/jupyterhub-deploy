@@ -1,5 +1,5 @@
 from jupyterhub.auth import Authenticator
-from keystoneauth1 import loading, session
+from keystoneauth1 import session
 from keystoneauth1.identity import v3
 from tornado import gen
 from traitlets import Unicode
@@ -30,7 +30,10 @@ class KeystoneAuthenticator(Authenticator):
 
         userdict = {'name': username}
         userdict['auth_state'] = auth_state = {}
+        auth_state['auth_url'] = self.auth_url
         auth_state['os_token'] = sess.get_auth_headers()['X-Auth-Token']
+
+        self.log.debug(userdict)
         # Now we set up auth_state
         # A public email will return in the initial query (assuming default scope).
         # Private will not.
@@ -40,6 +43,9 @@ class KeystoneAuthenticator(Authenticator):
     def pre_spawn_start(self, user, spawner):
         auth_state = yield user.get_auth_state()
         if not auth_state:
+            self.log.debug('******************* auth_state is not enabled??')
             # auth_state not enabled
             return
+        self.log.debug('******************* sending environment to spawner')
+        spawner.environment['OS_URL'] = auth_state['auth_url']
         spawner.environment['OS_TOKEN'] = auth_state['os_token']

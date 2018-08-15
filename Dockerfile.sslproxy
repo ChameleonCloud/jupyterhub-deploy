@@ -1,7 +1,5 @@
 FROM nginx
 
-#RUN openssl dhparam -out /etc/nginx/dhparam.pem 4096
-
 COPY ./etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
 VOLUME ["/certs"]
