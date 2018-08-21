@@ -2,7 +2,7 @@ from keystoneauth1 import adapter, session
 from keystoneauth1.identity import v3
 from os import getenv
 
-def factory(project_name, region_name=None):
+def create(project_name, region_name=None):
     auth_url = getenv('OS_URL')
     token = getenv('OS_TOKEN')
 

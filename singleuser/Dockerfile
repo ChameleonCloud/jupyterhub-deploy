@@ -25,4 +25,6 @@ USER root
 COPY python-chameleoncloud /opt/python-chameleoncloud
 RUN cd /opt/python-chameleoncloud && python setup.py install
 
-USER $NB_UID
+# Don't change back to $NB_UID - we need to launch as root for the sudo
+# Capabilities to be set up properly
+ENV GRANT_SUDO=yes

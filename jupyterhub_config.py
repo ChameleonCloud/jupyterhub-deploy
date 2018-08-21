@@ -47,6 +47,10 @@ c.DockerSpawner.default_url = '/lab'
 c.DockerSpawner.remove_containers = True
 # For debugging arguments passed to spawned containers
 c.DockerSpawner.debug = True
+# Allow users to have sudo access within their container
+c.DockerSpawner.environment = {
+    'GRANT_SUDO': 'yes',
+}
 
 from subprocess import check_call
 # This is where we can do other specific bootstrapping for the user environment
