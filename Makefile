@@ -9,6 +9,15 @@ volumes:
 	@docker volume inspect $(DATA_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DATA_VOLUME_HOST)
 	@docker volume inspect $(DB_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DB_VOLUME_HOST)
 
+secrets/hub.key:
+	@echo "Generating RSA(2048) private key in $@"
+	@openssl genrsa 2048 > $@
+
+secrets/hub.crt: secrets/hub.key
+	@echo "Generating self-signed certificate in $@"
+	@openssl req -new -x509 -nodes -days 365 -key $< -out $@ \
+		-subj "/C=US/ST=Illinois/L=Chicago/O=Univesity of Chicago/CN=localhost"
+
 secrets/dhparam.pem:
 	@echo "Generating Diffie-Hellman params in $@"
 	@openssl dhparam -dsaparam -out $@ 2048
@@ -31,7 +40,7 @@ userlist:
 	@exit 1
 
 .PHONY: check-files
-check-files: secrets/dhparam.pem secrets/jupyterhub.env secrets/mysql.env userlist
+check-files: secrets/dhparam.pem secrets/hub.crt secrets/hub.key secrets/jupyterhub.env secrets/mysql.env userlist
 
 .PHONY: pull
 pull:
