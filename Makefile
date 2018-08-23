@@ -9,7 +9,10 @@ volumes:
 	@docker volume inspect $(DATA_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DATA_VOLUME_HOST)
 	@docker volume inspect $(DB_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DB_VOLUME_HOST)
 
-secrets/hub.key:
+secrets:
+	mkdir -p $@
+
+secrets/hub.key: secrets
 	@echo "Generating RSA(2048) private key in $@"
 	@openssl genrsa 2048 > $@
 
@@ -18,15 +21,15 @@ secrets/hub.crt: secrets/hub.key
 	@openssl req -new -x509 -nodes -days 365 -key $< -out $@ \
 		-subj "/C=US/ST=Illinois/L=Chicago/O=Univesity of Chicago/CN=localhost"
 
-secrets/dhparam.pem:
+secrets/dhparam.pem: secrets
 	@echo "Generating Diffie-Hellman params in $@"
 	@openssl dhparam -dsaparam -out $@ 2048
 
-secrets/jupyterhub.env:
+secrets/jupyterhub.env: secrets
 	@echo "Generating JupyterHub encryption keys in $@"
 	@echo "JUPYTERHUB_CRYPT_KEY=$(shell openssl rand -hex 32)" > $@
 
-secrets/mysql.env:
+secrets/mysql.env: secrets
 	@echo "Generating mysql passwords in $@"
 	@echo "MYSQL_ROOT_PASSWORD=$(shell openssl rand -hex 32)" > $@
 	@echo "MYSQL_USER=jupyterhub" >> $@
