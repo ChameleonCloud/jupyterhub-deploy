@@ -36,14 +36,8 @@ secrets/mysql.env: secrets
 	@echo "MYSQL_PASSWORD=$(shell openssl rand -hex 32)" >> $@
 	@echo "MYSQL_DATABASE=jupyterhub" >> $@
 
-userlist:
-	@echo "Add usernames, one per line, to ./userlist, such as:"
-	@echo "    zoe admin"
-	@echo "    wash"
-	@exit 1
-
 .PHONY: check-files
-check-files: secrets/dhparam.pem secrets/hub.crt secrets/hub.key secrets/jupyterhub.env secrets/mysql.env userlist
+check-files: secrets/dhparam.pem secrets/hub.crt secrets/hub.key secrets/jupyterhub.env secrets/mysql.env
 
 .PHONY: pull
 pull:

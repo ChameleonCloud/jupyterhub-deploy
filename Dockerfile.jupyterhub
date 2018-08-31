@@ -10,4 +10,4 @@ RUN /opt/conda/bin/conda install -c bioconda mysqlclient=1.3 && \
 COPY ./keystoneauthenticator /opt/keystoneauthenticator
 RUN cd /opt/keystoneauthenticator && python setup.py install
 
-COPY ./userlist /srv/jupyterhub/userlist
+COPY ./adminlist /srv/jupyterhub/adminlist

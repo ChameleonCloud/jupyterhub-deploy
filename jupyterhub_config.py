@@ -89,17 +89,13 @@ c.JupyterHub.db_url = 'mysql+mysqldb://{user}:{password}@{host}/{db}'.format(
     db=os.environ['MYSQL_DATABASE'],
 )
 
-# Whitelist users and admins
-c.Authenticator.whitelist = whitelist = set()
+# Whitelist admins.
 c.Authenticator.admin_users = admin = set()
+# Allow admins to manage single-server instances of users.
 c.JupyterHub.admin_access = True
 pwd = os.path.dirname(__file__)
-with open(os.path.join(pwd, 'userlist')) as f:
+with open(os.path.join(pwd, 'admins')) as f:
     for line in f:
         if not line:
             continue
-        parts = line.split()
-        name = parts[0]
-        whitelist.add(name)
-        if len(parts) > 1 and parts[1] == 'admin':
-            admin.add(name)
+        admin.add(line)
