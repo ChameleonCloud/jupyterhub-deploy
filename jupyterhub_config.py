@@ -94,7 +94,7 @@ c.Authenticator.admin_users = admin = set()
 # Allow admins to manage single-server instances of users.
 c.JupyterHub.admin_access = True
 pwd = os.path.dirname(__file__)
-with open(os.path.join(pwd, 'admins')) as f:
+with open(os.path.join(pwd, 'adminlist')) as f:
     for line in f:
         if not line:
             continue
