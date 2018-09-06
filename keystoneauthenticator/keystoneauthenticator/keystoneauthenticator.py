@@ -33,19 +33,13 @@ class KeystoneAuthenticator(Authenticator):
         auth_state['auth_url'] = self.auth_url
         auth_state['os_token'] = sess.get_auth_headers()['X-Auth-Token']
 
-        self.log.debug(userdict)
-        # Now we set up auth_state
-        # A public email will return in the initial query (assuming default scope).
-        # Private will not.
         return userdict
 
     @gen.coroutine
     def pre_spawn_start(self, user, spawner):
         auth_state = yield user.get_auth_state()
         if not auth_state:
-            self.log.debug('******************* auth_state is not enabled??')
             # auth_state not enabled
             return
-        self.log.debug('******************* sending environment to spawner')
         spawner.environment['OS_URL'] = auth_state['auth_url']
         spawner.environment['OS_TOKEN'] = auth_state['os_token']
