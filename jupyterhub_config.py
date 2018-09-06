@@ -65,14 +65,14 @@ c.Spawner.mem_limit = '2G'
 c.Spawner.debug = True
 
 # User containers will access hub by container name on the Docker network
-c.JupyterHub.hub_ip = 'hub'
+c.JupyterHub.hub_ip = 'jupyterhub'
 c.JupyterHub.hub_port = 8080
 
 c.JupyterHub.bind_url = 'http://:8000'
 
 # Authenticate users with Keystone
 c.JupyterHub.authenticator_class = 'keystoneauthenticator.KeystoneAuthenticator'
-c.KeystoneAuthenticator.auth_url = 'https://chi.tacc.chameleoncloud.org:5000/v3'
+c.KeystoneAuthenticator.auth_url = 'https://chi.uc.chameleoncloud.org:5000/v3'
 # KeystoneAuthenticator uses auth_state to store Keystone token information
 c.Authenticator.enable_auth_state = True
 
