@@ -1,0 +1,13 @@
+-e git://github.com/ChameleonCloud/python-chi.git#egg=python_chi
+gnocchiclient
+keystoneauth1
+python-blazarclient
+python-cinderclient
+python-glanceclient
+python-heatclient
+python-ironicclient
+python-keystoneclient
+python-neutronclient
+python-novaclient
+python-openstackclient
+python-swiftclient
