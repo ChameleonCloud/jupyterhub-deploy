@@ -1,4 +1,3 @@
--e git://github.com/ChameleonCloud/python-chi.git#egg=python_chi
 gnocchiclient
 keystoneauth1
 python-blazarclient

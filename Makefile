@@ -12,19 +12,6 @@ volumes:
 secrets:
 	mkdir -p $@
 
-secrets/hub.key: secrets
-	@echo "Generating RSA(2048) private key in $@"
-	@openssl genrsa 2048 > $@
-
-secrets/hub.crt: secrets/hub.key
-	@echo "Generating self-signed certificate in $@"
-	@openssl req -new -x509 -nodes -days 365 -key $< -out $@ \
-		-subj "/C=US/ST=Illinois/L=Chicago/O=Univesity of Chicago/CN=localhost"
-
-secrets/dhparam.pem: secrets
-	@echo "Generating Diffie-Hellman params in $@"
-	@openssl dhparam -dsaparam -out $@ 2048
-
 secrets/jupyterhub.env: secrets
 	@echo "Generating JupyterHub encryption keys in $@"
 	@echo "JUPYTERHUB_CRYPT_KEY=$(shell openssl rand -hex 32)" > $@
@@ -37,17 +24,18 @@ secrets/mysql.env: secrets
 	@echo "MYSQL_DATABASE=jupyterhub" >> $@
 
 .PHONY: check-files
-check-files: secrets/dhparam.pem secrets/hub.crt secrets/hub.key secrets/jupyterhub.env secrets/mysql.env
+check-files: secrets/jupyterhub.env secrets/mysql.env
 
 .PHONY: pull
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
 
-.PHONY: notebook_image
-notebook_image: pull singleuser/Dockerfile
+.PHONY: singleuser
+singleuser: pull singleuser/Dockerfile
 	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
+		--build-arg PYTHON_CHI_VERSION=$(PYTHON_CHI_VERSION) \
 		singleuser
 
 .PHONY: build

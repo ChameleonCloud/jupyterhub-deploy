@@ -11,7 +11,7 @@ A proof of concept for how to deploy JupyterHub with Docker containers.
 First, build the notebook image. This is the base image that is used to create the single-user Jupyter notebook server that you actually interact with.
 
 ```
-make notebook_image
+make singleuser
 ```
 
 Then, start up the JupyterHub stack. This will create a MySQL database and also a JupyterHub container (along with a SSL proxy).
@@ -28,4 +28,3 @@ make start
 
 At this point, you should have a JupyterHub server running on your localhost port 443. You will have to confirm the security exception, as the certificate is self-signed.
 You can log in to the JupyterHub server using your Chameleon credentials.
-

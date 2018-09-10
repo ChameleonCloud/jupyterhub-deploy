@@ -18,12 +18,13 @@ services:
       - hub-db
     build:
       context: .
-      dockerfile: Dockerfile.jupyterhub
       args:
         JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
     restart: always
     image: jupyterhub
     container_name: jupyterhub
+    ports:
+      - "8000:8000"
     volumes:
       # Bind Docker socket on the host so we can connect to the daemon from
       # within the container
@@ -42,24 +43,6 @@ services:
     env_file:
       - secrets/jupyterhub.env
       - secrets/mysql.env
-
-  hub-sslproxy:
-    depends_on:
-      - hub
-    build:
-      context: .
-      dockerfile: Dockerfile.sslproxy
-    restart: always
-    image: nginx
-    container_name: jupyterhub_sslproxy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "$PWD/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
-      - "$PWD/secrets/hub.crt:/certs/hub.crt"
-      - "$PWD/secrets/hub.key:/certs/hub.key"
-      - "$PWD/secrets/dhparam.pem:/certs/dhparam.pem"
 
 volumes:
   data:
