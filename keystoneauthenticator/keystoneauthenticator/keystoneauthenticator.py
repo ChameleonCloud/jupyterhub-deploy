@@ -41,5 +41,8 @@ class KeystoneAuthenticator(Authenticator):
         if not auth_state:
             # auth_state not enabled
             return
-        spawner.environment['OS_URL'] = auth_state['auth_url']
+        spawner.environment['OS_AUTH_URL'] = auth_state['auth_url']
         spawner.environment['OS_TOKEN'] = auth_state['os_token']
+        spawner.environment['OS_IDENTITY_API_VERSION'] = '3'
+        spawner.environment['OS_INTERFACE'] = 'public'
+        spawner.environment['OS_PROJECT_DOMAIN_NAME'] = 'default'
