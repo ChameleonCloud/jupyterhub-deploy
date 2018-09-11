@@ -10,11 +10,10 @@ c = get_config()
 # Logging
 ##################
 
-c.Application.log_level = 'DEBUG'
-c.JupyterHub.log_level = 'DEBUG'
-c.Spawner.debug = True
-# For debugging arguments passed to spawned containers
-c.DockerSpawner.debug = True
+c.Application.log_level = 'INFO'
+c.JupyterHub.log_level = 'INFO'
+c.Spawner.debug = False
+c.DockerSpawner.debug = False
 
 ##################
 # Base spawner
@@ -23,8 +22,15 @@ c.DockerSpawner.debug = True
 from subprocess import check_call
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
+    username = spawner.user.name
     # Run as authenticated user
-    spawner.environment['NB_USER'] = spawner.user.name
+    spawner.environment['NB_USER'] = username
+    spawner.environment['OS_IDENTITY_API_VERSION'] = '3'
+    spawner.environment['OS_INTERFACE'] = 'public'
+    spawner.environment['OS_KEYPAIR_PRIVATE_KEY'] = '/home/{}/.ssh/id_rsa'.format(username)
+    spawner.environment['OS_KEYPAIR_PUBLIC_KEY'] = '/home/{}/.ssh/id_rsa.pub'.format(username)
+    spawner.environment['OS_PROJECT_DOMAIN_NAME'] = 'default'
+    spawner.environment['OS_USER_DOMAIN_NAME'] = 'default'
 
 origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
