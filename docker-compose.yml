@@ -21,7 +21,7 @@ services:
       args:
         JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
     restart: always
-    image: jupyterhub
+    image: ${JUPYTERHUB_IMAGE}
     container_name: jupyterhub
     ports:
       - "8000:8000"
@@ -34,7 +34,7 @@ services:
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
       # JupyterHub will spawn this Notebook image for users
-      DOCKER_NOTEBOOK_IMAGE: ${LOCAL_NOTEBOOK_IMAGE}
+      DOCKER_NOTEBOOK_IMAGE: ${JUPYTERHUB_SINGLEUSER_IMAGE}
       OS_AUTH_URL: https://chi.uc.chameleoncloud.org:5000/v3
       MYSQL_HOST: hub-db
     env_file:

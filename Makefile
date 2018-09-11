@@ -1,5 +1,7 @@
 include .env
 
+REGISTRY := docker.chameleoncloud.org
+
 .PHONY: network
 network:
 	@docker network inspect $(DOCKER_NETWORK_NAME) >/dev/null 2>&1 || docker network create $(DOCKER_NETWORK_NAME)
@@ -26,18 +28,6 @@ secrets/mysql.env: secrets
 .PHONY: check-files
 check-files: secrets/jupyterhub.env secrets/mysql.env
 
-.PHONY: pull
-pull:
-	docker pull $(DOCKER_NOTEBOOK_IMAGE)
-
-.PHONY: singleuser
-singleuser: pull singleuser/Dockerfile
-	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
-		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
-		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
-		--build-arg PYTHON_CHI_VERSION=$(PYTHON_CHI_VERSION) \
-		singleuser
-
 .PHONY: build
 build: check-files network volumes
 	docker-compose build
@@ -45,3 +35,27 @@ build: check-files network volumes
 .PHONY: start
 start:
 	docker-compose up
+
+.PHONY: publish
+publish:
+	docker tag $(JUPYTERHUB_IMAGE) $(REGISTRY)/$(JUPYTERHUB_IMAGE)
+	docker push $(REGISTRY)/$(JUPYTERHUB_IMAGE)
+
+# Single user notebook targets
+
+.PHONY: singleuser
+singleuser: singleuser-pull
+	docker build -t $(JUPYTERHUB_SINGLEUSER_IMAGE) \
+		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
+		--build-arg PYTHON_CHI_VERSION=$(PYTHON_CHI_VERSION) \
+		singleuser
+
+.PHONY: singleuser-pull
+singleuser-pull:
+	docker pull $(DOCKER_NOTEBOOK_IMAGE)
+
+.PHONY: singleuser-publish
+singleuser-publish:
+	docker tag $(JUPYTERHUB_SINGLEUSER_IMAGE) $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE)
+	docker push $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE)
