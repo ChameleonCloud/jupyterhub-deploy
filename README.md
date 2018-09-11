@@ -42,4 +42,4 @@ make publish
 make singleuser-publish
 ```
 
-**Note**: this will always override the version currently existing on the repository - we currently do not version these images.
+**Note**: this will always override the version currently existing on the repository - we currently do not version these images, other than including the JupyterHub release version as a tag.

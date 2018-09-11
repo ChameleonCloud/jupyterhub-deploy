@@ -38,8 +38,8 @@ start:
 
 .PHONY: publish
 publish:
-	docker tag $(JUPYTERHUB_IMAGE) $(REGISTRY)/$(JUPYTERHUB_IMAGE)
-	docker push $(REGISTRY)/$(JUPYTERHUB_IMAGE)
+	docker tag $(JUPYTERHUB_IMAGE) $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
+	docker push $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
 
 # Single user notebook targets
 
