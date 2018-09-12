@@ -1,5 +1,11 @@
+# Jupyter notebook artifacts
+.ipynb_checkpoints/
+
+# Python build files
 __pycache__/
 **/*.egg-info/
 **/build/
 **/dist/
-secrets/
+
+# Local secrets
+/secrets/

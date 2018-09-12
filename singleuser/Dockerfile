@@ -1,10 +1,11 @@
-ARG DOCKER_NOTEBOOK_IMAGE
-FROM $DOCKER_NOTEBOOK_IMAGE
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
 
 USER root
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    openssh-client \
+       openssh-client \
+       texlive-xetex \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -16,6 +17,9 @@ RUN python3 -m pip install --no-cache \
 COPY requirements.txt /tmp/singleuser-requirements.txt
 RUN python3 -m pip install --no-cache -r /tmp/singleuser-requirements.txt \
   && rm -f /tmp/singleuser-requirements.txt
+
+RUN jupyter labextension install \
+  @jupyterlab/latex
 
 ARG PYTHON_CHI_VERSION
 RUN python3 -m pip install --no-cache \

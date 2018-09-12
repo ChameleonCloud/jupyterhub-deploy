@@ -11,15 +11,11 @@ services:
     volumes:
       - "db:${DB_VOLUME_CONTAINER}"
       # Mount config overrides
-      - "$PWD/etc/mysql:/etc/mysql/conf.d"
+      - "./etc/mysql:/etc/mysql/conf.d"
 
   hub:
     depends_on:
       - hub-db
-    build:
-      context: .
-      args:
-        JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
     restart: always
     image: ${JUPYTERHUB_IMAGE}
     container_name: jupyterhub
@@ -32,10 +28,12 @@ services:
       - "data:${DATA_VOLUME_CONTAINER}"
     environment:
       # All containers will join this network
-      DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
+      DOCKER_NETWORK_NAME: ${NETWORK_NAME}
       # JupyterHub will spawn this Notebook image for users
       DOCKER_NOTEBOOK_IMAGE: ${JUPYTERHUB_SINGLEUSER_IMAGE}
+      # Keystone authentication will happen against this auth URL
       OS_AUTH_URL: https://chi.uc.chameleoncloud.org:5000/v3
+      # Point to MySQL container
       MYSQL_HOST: hub-db
     env_file:
       - secrets/jupyterhub.env
@@ -52,4 +50,4 @@ volumes:
 networks:
   default:
     external:
-      name: ${DOCKER_NETWORK_NAME}
+      name: ${NETWORK_NAME}
