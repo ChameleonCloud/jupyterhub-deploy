@@ -34,14 +34,23 @@ singleuser-build:
 
 .PHONY: singleuser-start
 singleuser-start:
-	docker run --rm --publish 8888:8888 \
+	docker run --rm --interactive --tty \
+		--publish 8888:8888 \
 		--user root \
-		--env GRANT_SUDO=yes \
-		--env JUPYTER_ENABLE_LAB=yes \
-		--env NB_USER=$(USER) \
 		--mount "type=bind,src=$(JUPYTERHUB_SINGLEUSER_WORKDIR),target=/work" \
 		--workdir "/work" \
-		$(JUPYTERHUB_SINGLEUSER_IMAGE)
+		$(JUPYTERHUB_SINGLEUSER_IMAGE) \
+		sh -c 'pip install -e . && jupyter labextension install && jupyter lab --watch --allow-root'
+
+.PHONY: singleuser-shell
+singleuser-shell:
+	docker run --rm --interactive --tty \
+		--publish 8888:8888 \
+		--user root \
+		--mount "type=bind,src=$(JUPYTERHUB_SINGLEUSER_WORKDIR),target=/work" \
+		--workdir "/work" \
+		$(JUPYTERHUB_SINGLEUSER_IMAGE) \
+		bash
 
 .PHONY: singleuser-publish
 singleuser-publish:
