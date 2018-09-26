@@ -52,7 +52,7 @@ c.DockerSpawner.use_internal_ip = True
 c.DockerSpawner.network_name = network_name
 # Pass the network name as argument to spawned containers
 c.DockerSpawner.extra_host_config = { 'network_mode': network_name }
-notebook_dir = '/work'
+notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
 c.DockerSpawner.notebook_dir = notebook_dir
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container
@@ -62,6 +62,7 @@ c.DockerSpawner.remove_containers = True
 # Need to launch the container as root in order to grant sudo access
 c.DockerSpawner.extra_create_kwargs.update({ 'user': 'root' })
 c.DockerSpawner.environment = {
+    'CHOWN_EXTRA': notebook_dir,
     # Allow users to have sudo access within their container
     'GRANT_SUDO': 'yes',
     # Enable JupyterLab application
