@@ -28,4 +28,7 @@ RUN python3 -m pip install --no-cache \
 # Hooks are run automatically via the base-notebook's start.sh script
 COPY before-notebook.d/* /usr/local/bin/before-notebook.d/
 
+RUN mkdir -p /etc/jupyter/serverroot
+COPY serverroot/* /etc/jupyter/serverroot/
+
 USER $NB_USER
