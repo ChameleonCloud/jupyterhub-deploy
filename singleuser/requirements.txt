@@ -1,5 +1,6 @@
 # JupyterLab extensions
 jupyterlab_latex==0.4.0
+tqdm==4.26.0
 
 # OpenStack clients
 gnocchiclient==7.0.4
@@ -14,3 +15,6 @@ python-neutronclient==6.10.0
 python-novaclient==11.0.0
 python-openstackclient==3.16.1
 python-swiftclient==3.6.0
+
+# ChameleonCloud-provided
+git+git://github.com/ChameleonCloud/python-chi.git@6587bdcf4b85a6b7202fd3027108938f46f2fd7d#egg=python-chi

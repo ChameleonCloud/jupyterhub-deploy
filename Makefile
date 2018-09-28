@@ -1,6 +1,7 @@
 include .env
 
 JUPYTERHUB_SINGLEUSER_WORKDIR ?= $(PWD)
+JUPYTERHUB_SINGLEUSER_VERSION ?= latest
 
 REGISTRY := docker.chameleoncloud.org
 
@@ -27,9 +28,7 @@ hub-publish:
 singleuser-build:
 	docker pull $(JUPYTERHUB_SINGLEUSER_BASE_IMAGE)
 	docker build -t $(JUPYTERHUB_SINGLEUSER_IMAGE) \
-		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg BASE_IMAGE=$(JUPYTERHUB_SINGLEUSER_BASE_IMAGE) \
-		--build-arg PYTHON_CHI_VERSION=$(PYTHON_CHI_VERSION) \
 		singleuser
 
 .PHONY: singleuser-start
@@ -54,8 +53,8 @@ singleuser-shell:
 
 .PHONY: singleuser-publish
 singleuser-publish:
-	docker tag $(JUPYTERHUB_SINGLEUSER_IMAGE) $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE)
-	docker push $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE)
+	docker tag $(JUPYTERHUB_SINGLEUSER_IMAGE) $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION)
+	docker push $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION)
 
 # Local development helper targets
 

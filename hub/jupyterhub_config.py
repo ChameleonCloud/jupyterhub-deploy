@@ -53,7 +53,8 @@ c.DockerSpawner.network_name = network_name
 # Pass the network name as argument to spawned containers
 c.DockerSpawner.extra_host_config = { 'network_mode': network_name }
 notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
-c.DockerSpawner.notebook_dir = notebook_dir
+# This directory will be symlinked to the `notebook_dir` at runtime.
+c.DockerSpawner.notebook_dir = '~/work'
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container
 c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }

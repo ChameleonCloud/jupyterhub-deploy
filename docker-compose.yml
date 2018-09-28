@@ -28,7 +28,7 @@ services:
       - "data:${DATA_VOLUME_CONTAINER}"
     environment:
       # All containers will join this network
-      DOCKER_NETWORK_NAME: ${NETWORK_NAME}
+      DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
       # The container directory that will hold the user's working files
       DOCKER_NOTEBOOK_DIR: /work
       # JupyterHub will spawn this Notebook image for users
@@ -52,4 +52,4 @@ volumes:
 networks:
   default:
     external:
-      name: ${NETWORK_NAME}
+      name: ${DOCKER_NETWORK_NAME}
