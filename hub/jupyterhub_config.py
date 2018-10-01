@@ -64,6 +64,7 @@ c.DockerSpawner.remove_containers = True
 c.DockerSpawner.extra_create_kwargs.update({ 'user': 'root' })
 c.DockerSpawner.environment = {
     'CHOWN_EXTRA': notebook_dir,
+    'CHOWN_EXTRA_OPTS': '-R',
     # Allow users to have sudo access within their container
     'GRANT_SUDO': 'yes',
     # Enable JupyterLab application
