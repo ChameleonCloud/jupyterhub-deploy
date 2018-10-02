@@ -4,10 +4,12 @@ FROM $BASE_IMAGE
 USER root
 
 #
-# JupyterLab customization
+# JupyterLab extensions
 #
 
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+# https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager#version-compatibility
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.37
+
 RUN apt-get update \
   && apt-get install -yq texlive-xetex \
   && apt-get clean && rm -rf /var/lib/apt/lists/* \
@@ -21,6 +23,12 @@ RUN apt-get update \
 COPY requirements.txt /tmp/singleuser-requirements.txt
 RUN python3 -m pip install --no-cache -r /tmp/singleuser-requirements.txt \
   && rm -f /tmp/singleuser-requirements.txt
+
+#
+# Enable server extensions
+#
+
+RUN jupyter nbextension enable --py widgetsnbextension
 
 #
 # Notebook start hooks
