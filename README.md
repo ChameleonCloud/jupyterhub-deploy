@@ -9,9 +9,9 @@ There are two images defined, each in its own directory:
 
 ## Releasing new versions
 
-To build and release a new version of either the JupyterHub server or the single-user Notebook image, use the `*-build` and `*-publish` targets.
+To build and release a new version of either the JupyterHub server or the single-user Notebook image, use the `*-build` and `*-publish` targets. New releases are always tagged with the Git SHA of the latest commit that touched the directory containing the build definitions.
 
-> **Note**: this will always override the version currently existing on the repository - we currently do not version these images, other than including the JupyterHub release version as a tag.
+**Note**: when releasing new versions, particularly when dependences are updated, it is particularly important to ensure compatibility between the version of JupyterHub built and the version of JupyterLab used in the single-user image. Ensure the base image for the singleuser image (we use the [minimal-notebook](https://github.com/jupyter/docker-stacks/tree/master/minimal-notebook) Docker stack provided by Jupyter) has a matching JupyterHub version.
 
 ```
 # Publish the JupyterHub image to the Docker registry

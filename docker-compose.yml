@@ -17,7 +17,7 @@ services:
     depends_on:
       - hub-db
     restart: always
-    image: ${JUPYTERHUB_IMAGE}
+    image: ${JUPYTERHUB_IMAGE}:dev
     container_name: jupyterhub
     ports:
       - "8000:8000"
@@ -32,7 +32,7 @@ services:
       # The container directory that will hold the user's working files
       DOCKER_NOTEBOOK_DIR: /work
       # JupyterHub will spawn this Notebook image for users
-      DOCKER_NOTEBOOK_IMAGE: ${JUPYTERHUB_SINGLEUSER_IMAGE}
+      DOCKER_NOTEBOOK_IMAGE: ${JUPYTERHUB_SINGLEUSER_IMAGE}:dev
       # Keystone authentication will happen against this auth URL
       OS_AUTH_URL: https://chi.uc.chameleoncloud.org:5000/v3
       # Point to MySQL container

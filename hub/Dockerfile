@@ -1,5 +1,4 @@
-ARG JUPYTERHUB_VERSION
-FROM jupyterhub/jupyterhub-onbuild:${JUPYTERHUB_VERSION}
+FROM jupyterhub/jupyterhub-onbuild:0.9.4
 
 # Install mysql client and dockerspawner
 RUN /opt/conda/bin/conda install -c bioconda mysqlclient=1.3 && \

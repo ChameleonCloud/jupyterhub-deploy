@@ -1,19 +1,27 @@
-ARG BASE_IMAGE
-FROM $BASE_IMAGE
+FROM jupyter/minimal-notebook:610bb8b938db
 
 USER root
 
 #
-# JupyterLab extensions
+# Additional packages
 #
 
-# https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager#version-compatibility
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.37
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    curl \
+    dnsutils \
+    vim \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update \
-  && apt-get install -yq texlive-xetex \
-  && apt-get clean && rm -rf /var/lib/apt/lists/* \
-  && jupyter labextension install @jupyterlab/latex
+#
+# JupyterLab extensions
+# Note: JupyterLab is quite unstable at the moment (not 1.x yet) and as such
+# whenever a new minor version of JupyterLab is released, often the extensions
+# need to be updated.
+#
+
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.37
+RUN jupyter labextension install @jupyterlab/latex@0.5
 
 #
 # Notebook dependencies

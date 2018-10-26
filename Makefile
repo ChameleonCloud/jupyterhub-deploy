@@ -1,7 +1,9 @@
 include .env
 
 JUPYTERHUB_SINGLEUSER_WORKDIR ?= $(PWD)
-JUPYTERHUB_SINGLEUSER_VERSION ?= latest
+
+JUPYTERHUB_SINGLEUSER_VERSION = $(shell git log -n1 --format=%h -- singleuser)
+JUPYTERHUB_VERSION = $(shell git log -n1 --format=%h -- hub)
 
 REGISTRY := docker.chameleoncloud.org
 
@@ -9,9 +11,9 @@ REGISTRY := docker.chameleoncloud.org
 
 .PHONY: hub-build
 hub-build:
-	docker build -t $(JUPYTERHUB_IMAGE) \
-		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
-		hub
+	docker build -t $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) hub
+	# Tag for local development
+	docker tag $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) $(JUPYTERHUB_IMAGE):dev
 
 .PHONY: hub-start
 hub-start: check-files network volumes
@@ -19,17 +21,17 @@ hub-start: check-files network volumes
 
 .PHONY: hub-publish
 hub-publish:
-	docker tag $(JUPYTERHUB_IMAGE) $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
+	docker tag $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) \
+		         $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
 	docker push $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
 
 # Single user notebook targets
 
 .PHONY: singleuser-build
 singleuser-build:
-	docker pull $(JUPYTERHUB_SINGLEUSER_BASE_IMAGE)
-	docker build -t $(JUPYTERHUB_SINGLEUSER_IMAGE) \
-		--build-arg BASE_IMAGE=$(JUPYTERHUB_SINGLEUSER_BASE_IMAGE) \
-		singleuser
+	docker build -t $(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION) singleuser
+	# Tag for local development
+	docker tag $(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION) $(JUPYTERHUB_SINGLEUSER_IMAGE):dev
 
 .PHONY: singleuser-start
 singleuser-start:
@@ -38,7 +40,7 @@ singleuser-start:
 		--user root \
 		--mount "type=bind,src=$(JUPYTERHUB_SINGLEUSER_WORKDIR),target=/work" \
 		--workdir "/work" \
-		$(JUPYTERHUB_SINGLEUSER_IMAGE) \
+		$(JUPYTERHUB_SINGLEUSER_IMAGE):dev \
 		sh -c 'pip install -e . && jupyter labextension install && jupyter lab --watch --allow-root'
 
 .PHONY: singleuser-shell
@@ -48,12 +50,13 @@ singleuser-shell:
 		--user root \
 		--mount "type=bind,src=$(JUPYTERHUB_SINGLEUSER_WORKDIR),target=/work" \
 		--workdir "/work" \
-		$(JUPYTERHUB_SINGLEUSER_IMAGE) \
+		$(JUPYTERHUB_SINGLEUSER_IMAGE):dev \
 		bash
 
 .PHONY: singleuser-publish
 singleuser-publish:
-	docker tag $(JUPYTERHUB_SINGLEUSER_IMAGE) $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION)
+	docker tag $(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION) \
+		         $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION)
 	docker push $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION)
 
 # Local development helper targets

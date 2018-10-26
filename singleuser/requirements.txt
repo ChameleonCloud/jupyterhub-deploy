@@ -1,28 +1,28 @@
 # JupyterLab extensions
-ipywidgets==7.4.2
-jupyterlab_latex==0.4.0
-tqdm==4.26.0
+ipywidgets~=7.4.0
+jupyterlab_latex~=0.4.0
+tqdm~=4.0
 
 # Commonly-used libraries
-matplotlib===3.0.0
-numpy===1.15.2
-pandas===0.23.4
-scipy===1.1.0
-seaborn===0.9.0
+matplotlib~=3.0
+numpy~=1.15
+pandas~=0.23.0
+scipy~=1.1
+seaborn~=0.9.0
 
 # OpenStack clients
-gnocchiclient==7.0.4
-keystoneauth1==3.10.0
-python-blazarclient==2.0.1
-python-cinderclient==4.0.1
-python-glanceclient==2.12.1
-python-heatclient==1.16.1
-python-ironicclient==2.5.0
-python-keystoneclient==3.17.0
-python-neutronclient==6.10.0
-python-novaclient==11.0.0
-python-openstackclient==3.16.1
-python-swiftclient==3.6.0
+gnocchiclient~=7.0
+keystoneauth1~=3.0
+python-blazarclient~=2.0
+python-cinderclient~=4.0
+python-glanceclient~=2.0
+python-heatclient~=1.0
+python-ironicclient~=2.0
+python-keystoneclient~=3.0
+python-neutronclient~=6.0
+python-novaclient~=11.0
+python-openstackclient~=3.0
+python-swiftclient~=3.6.0
 
 # ChameleonCloud-provided
 git+git://github.com/ChameleonCloud/python-chi.git@76fec3a8b71b2a3636ddd007162aa562460feb2e#egg=python-chi
