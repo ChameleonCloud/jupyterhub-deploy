@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.37
 RUN jupyter labextension install @jupyterlab/latex@0.5
-RUN jupyter labextension install @chameleoncloud/jupyterlab_swift@0.1.0
+RUN jupyter labextension install @chameleoncloud/jupyterlab_swift@0.2.0
 
 #
 # Notebook dependencies
