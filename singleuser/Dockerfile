@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 #
 
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.37
+RUN jupyter labextension install @jupyter/jupyterlab-git@0.4
 RUN jupyter labextension install @jupyterlab/latex@0.5
 RUN jupyter labextension install @chameleoncloud/jupyterlab_swift@0.2.0
 
@@ -38,6 +39,7 @@ RUN python3 -m pip install --no-cache -r /tmp/singleuser-requirements.txt \
 #
 
 RUN jupyter nbextension enable --py widgetsnbextension
+RUN jupyter serverextension enable --py jupyterlab_git
 
 #
 # Notebook start hooks
