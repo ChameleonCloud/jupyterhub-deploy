@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Copy examples and other "first launch" files over.
 rsync -aq /etc/jupyter/serverroot/ /work/
 
