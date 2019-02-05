@@ -1,4 +1,4 @@
-FROM jupyter/minimal-notebook:610bb8b938db
+FROM jupyter/minimal-notebook:83ed2c63671f
 
 USER root
 
@@ -20,10 +20,11 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 # need to be updated.
 #
 
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.37
-RUN jupyter labextension install @jupyter/jupyterlab-git@0.4
-RUN jupyter labextension install @jupyterlab/latex@0.5
-RUN jupyter labextension install @chameleoncloud/jupyterlab_swift@0.2.0
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.38
+RUN jupyter labextension install @jupyterlab/git@0.4.4
+RUN jupyter labextension install @jupyterlab/latex@0.6.1
+RUN jupyter labextension install @chameleoncloud/jupyterlab-theme-extension@0.0.5
+RUN jupyter labextension install @chameleoncloud/jupyterlab_swift@0.3.0
 
 #
 # Notebook dependencies

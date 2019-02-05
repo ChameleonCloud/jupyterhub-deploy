@@ -40,8 +40,7 @@ singleuser-start:
 		--user root \
 		--mount "type=bind,src=$(JUPYTERHUB_SINGLEUSER_WORKDIR),target=/work" \
 		--workdir "/work" \
-		$(JUPYTERHUB_SINGLEUSER_IMAGE):dev \
-		sh -c 'pip install -e . && jupyter labextension install && jupyter lab --watch --allow-root'
+		$(JUPYTERHUB_SINGLEUSER_IMAGE):dev
 
 .PHONY: singleuser-shell
 singleuser-shell:
