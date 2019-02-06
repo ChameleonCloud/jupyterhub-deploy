@@ -4,3 +4,6 @@
 if [[ "$NB_USER" != jovyan ]]; then
   ln -s "/home/$NB_USER" /home/jovyan
 fi
+
+# Fix permissions on entire home directory
+chown -R "$NB_USER:" "/home/$NB_USER"

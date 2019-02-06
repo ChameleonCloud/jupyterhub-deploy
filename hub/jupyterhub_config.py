@@ -62,9 +62,6 @@ c.DockerSpawner.remove_containers = True
 # Need to launch the container as root in order to grant sudo access
 c.DockerSpawner.extra_create_kwargs.update({ 'user': 'root' })
 c.DockerSpawner.environment = {
-    # Ensure entire home directory owned by user
-    'CHOWN_HOME': 'yes',
-    'CHOWN_HOME_OPTS': '-R',
     # Allow users to have sudo access within their container
     'GRANT_SUDO': 'yes',
     # Enable JupyterLab application
