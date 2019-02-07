@@ -39,6 +39,7 @@ RUN python3 -m pip install --no-cache -r /tmp/singleuser-requirements.txt \
 # Enable server extensions
 #
 
+RUN python3 -m bash_kernel.install
 RUN jupyter nbextension enable --py widgetsnbextension
 RUN jupyter serverextension enable --py jupyterlab_git
 

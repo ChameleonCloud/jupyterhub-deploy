@@ -5,6 +5,9 @@ jupyterlab_latex~=0.4.0
 jupyterlab_swift~=0.2.0
 tqdm~=4.0
 
+# IPython kernels
+bash_kernel~=0.7
+
 # Commonly-used libraries
 matplotlib~=3.0
 numpy~=1.15
