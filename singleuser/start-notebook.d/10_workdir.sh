@@ -2,7 +2,12 @@
 rsync -aq /etc/jupyter/serverroot/ /work/
 
 # Check out community notebooks
-git clone https://github.com/chameleoncloud/notebooks.git /work/notebooks
+notebooks_dir=/work/notebooks
+if [[ ! -d "$notebooks_dir" ]]; then
+  git clone https://github.com/chameleoncloud/notebooks.git "$notebooks_dir"
+else
+  (cd "$notebooks_dir" && git pull || true)
+fi
 
 # Our volume mount is at the root directory, link it in to the user's
 # home directory for convenience.
