@@ -30,4 +30,4 @@ python-openstackclient~=3.0
 python-swiftclient~=3.6.0
 
 # ChameleonCloud-provided
-git+git://github.com/ChameleonCloud/python-chi.git@76fec3a8b71b2a3636ddd007162aa562460feb2e#egg=python-chi
+python-chi~=0.2.0
