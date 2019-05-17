@@ -3,8 +3,13 @@
 
 # Configuration file for JupyterHub
 import os
+import sys
 
 c = get_config()
+
+server_idle_timeout = 60 * 60 * 24
+server_max_age = 60 * 60 * 24 * 7
+kernel_idle_timeout = 60 * 60 * 2
 
 ##################
 # Logging
@@ -59,8 +64,10 @@ c.DockerSpawner.notebook_dir = '~/work'
 c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
-# Need to launch the container as root in order to grant sudo access
-c.DockerSpawner.extra_create_kwargs.update({ 'user': 'root' })
+c.DockerSpawner.extra_create_kwargs.update({
+    # Need to launch the container as root in order to grant sudo access
+    'user': 'root'
+})
 c.DockerSpawner.environment = {
     'CHOWN_EXTRA': notebook_dir,
     'CHOWN_EXTRA_OPTS': '-R',
@@ -69,6 +76,12 @@ c.DockerSpawner.environment = {
     # Enable JupyterLab application
     'JUPYTER_ENABLE_LAB': 'yes',
 }
+c.DockerSpawner.cmd = [
+    'start-notebook.sh',
+    '--NotebookApp.shutdown_no_activity_timeout={}'.format(server_idle_timeout),
+    '--MappingKernelManager.cull_idle_timeout={}'.format(kernel_idle_timeout),
+    '--MappingKernelManager.cull_interval={}'.format(kernel_idle_timeout // 8)
+]
 
 ##################
 # Authentication
@@ -79,6 +92,13 @@ c.JupyterHub.authenticator_class = 'keystoneauthenticator.KeystoneAuthenticator'
 c.KeystoneAuthenticator.auth_url = os.environ['OS_AUTH_URL']
 # KeystoneAuthenticator uses auth_state to store Keystone token information
 c.Authenticator.enable_auth_state = True
+# Check state of authentication token before allowing a new server launch;
+# The Keystone authenticator will fail if the user's unscoped token has expired,
+# forcing them to log in, which is the right thing.
+c.Authenticator.refresh_pre_spawn = True
+# Automatically check the auth state this often. Not super useful for us, as
+# there's nothing we can really do about this.
+c.Authenticator.auth_refresh_age = 60 * 60
 
 ##################
 # Hub
@@ -102,6 +122,20 @@ c.JupyterHub.db_url = 'mysql+mysqldb://{user}:{password}@{host}/{db}'.format(
     db=os.environ['MYSQL_DATABASE'],
 )
 
+c.JupyterHub.services = [
+    {
+        'name': 'cull-idle',
+        'admin': True,
+        'command': [
+            sys.executable,
+            'cull_idle_servers.py',
+            '--timeout={}'.format(server_idle_timeout),
+            '--max_age={}'.format(server_max_age),
+            '--cull_every={}'.format(60 * 15),
+        ],
+    },
+]
+
 # Whitelist admins.
 c.Authenticator.admin_users = admin = set()
 # Allow admins to manage single-server instances of users.
@@ -111,4 +145,4 @@ with open(os.path.join(pwd, 'adminlist')) as f:
     for line in f:
         if not line:
             continue
-        admin.add(line)
+        admin.add(line.strip())

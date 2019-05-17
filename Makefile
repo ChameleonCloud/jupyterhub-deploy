@@ -10,10 +10,14 @@ REGISTRY := docker.chameleoncloud.org
 # Hub notebook targets
 
 .PHONY: hub-build
-hub-build:
+hub-build: hub/cull_idle_servers.py
 	docker build -t $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) hub
 	# Tag for local development
 	docker tag $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) $(JUPYTERHUB_IMAGE):dev
+
+hub/cull_idle_servers.py:
+	curl -L -o $@ \
+		https://raw.githubusercontent.com/jupyterhub/jupyterhub/master/examples/cull-idle/cull_idle_servers.py
 
 .PHONY: hub-start
 hub-start: check-files network volumes

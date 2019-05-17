@@ -9,3 +9,6 @@ __pycache__/
 
 # Local secrets
 /secrets/
+
+# Build dependencies
+hub/cull_idle_servers.py
