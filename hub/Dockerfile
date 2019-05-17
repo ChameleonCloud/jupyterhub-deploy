@@ -1,12 +1,9 @@
-FROM jupyterhub/jupyterhub-onbuild:0.9.4
+FROM jupyterhub/jupyterhub-onbuild:1.0.0
 
-# Install mysql client and dockerspawner
-RUN /opt/conda/bin/conda install -c bioconda mysqlclient=1.3 && \
-    /opt/conda/bin/conda clean -tipsy && \
-    /opt/conda/bin/pip install --no-cache-dir \
-        dockerspawner==0.9
-
-COPY ./keystoneauthenticator /opt/keystoneauthenticator
-RUN cd /opt/keystoneauthenticator && python setup.py install
+RUN conda install -c bioconda mysqlclient \
+    && conda clean -tipsy \
+    && pip install --no-cache-dir \
+      jupyterhub-keystoneauthenticator \
+      dockerspawner~=0.11.0
 
 COPY ./adminlist /srv/jupyterhub/adminlist

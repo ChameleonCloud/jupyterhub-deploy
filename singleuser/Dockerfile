@@ -1,4 +1,4 @@
-FROM jupyter/minimal-notebook:83ed2c63671f
+FROM jupyter/minimal-notebook:abdb27a6dfbb
 
 USER root
 
@@ -6,12 +6,11 @@ USER root
 # Additional packages
 #
 
-RUN apt-get update && apt-get install -yq --no-install-recommends \
-    curl \
-    dnsutils \
-    vim \
-    && apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -yq --no-install-recommends \
+         curl dnsutils jq vim \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 #
 # JupyterLab extensions
@@ -47,8 +46,11 @@ RUN jupyter serverextension enable --py jupyterlab_git
 # Notebook start hooks
 #
 
-RUN apt-get update && apt-get install -yq openssh-client rsync \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -yq --no-install-recommends \
+         openssh-client rsync \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 COPY start-notebook.d/* /usr/local/bin/start-notebook.d/
 COPY before-notebook.d/* /usr/local/bin/before-notebook.d/
 # Everything in serverroot gets copied to the user's working directory on start

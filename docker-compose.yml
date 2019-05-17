@@ -2,16 +2,13 @@ version: "2"
 
 services:
   hub-db:
-    # 10.3 is latest, but it is incompatible with JupyterHub
-    image: mariadb:10.2
+    image: mariadb
     container_name: jupyterhub-db
     restart: always
     env_file:
       - secrets/mysql.env
     volumes:
       - "db:${DB_VOLUME_CONTAINER}"
-      # Mount config overrides
-      - "./etc/mysql:/etc/mysql/conf.d"
 
   hub:
     depends_on:
