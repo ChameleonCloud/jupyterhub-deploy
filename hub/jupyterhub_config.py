@@ -99,6 +99,8 @@ c.Authenticator.refresh_pre_spawn = True
 # Automatically check the auth state this often. Not super useful for us, as
 # there's nothing we can really do about this.
 c.Authenticator.auth_refresh_age = 60 * 60
+# Keystone tokens only last 7 days; limit sessions to this amount of time too.
+c.JupyterHub.cookie_max_age_days = 7
 
 ##################
 # Hub
@@ -122,6 +124,11 @@ c.JupyterHub.db_url = 'mysql+mysqldb://{user}:{password}@{host}/{db}'.format(
     db=os.environ['MYSQL_DATABASE'],
 )
 
+# Enable restarting of Hub without affecting singleuser servers
+c.JupyterHub.cleanup_servers = False
+c.JupyterHub.cleanup_proxy = False
+
+# Automatically cull idle servers
 c.JupyterHub.services = [
     {
         'name': 'cull-idle',
