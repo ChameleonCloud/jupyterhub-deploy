@@ -57,4 +57,6 @@ COPY before-notebook.d/* /usr/local/bin/before-notebook.d/
 RUN mkdir -p /etc/jupyter/serverroot
 COPY serverroot/* /etc/jupyter/serverroot/
 
+COPY bashrc.d /home/$NB_USER/.bashrc.d
+
 USER $NB_USER
