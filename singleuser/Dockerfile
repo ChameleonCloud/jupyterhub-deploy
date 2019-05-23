@@ -8,9 +8,14 @@ USER root
 
 RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
-         curl dnsutils jq vim \
+         curl default-jre dnsutils jq vim \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -Lo /tmp/xoStitch.deb \
+      https://github.com/ChameleonCloud/xo-stitch/releases/download/v0.1-alpha/xoStitch.deb \
+    && dpkg -i /tmp/xoStitch.deb \
+    && rm -f /tmp/xoStitch.deb
 
 #
 # JupyterLab extensions
