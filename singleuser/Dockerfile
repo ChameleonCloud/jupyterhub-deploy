@@ -8,7 +8,7 @@ USER root
 
 RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
-         curl default-jre dnsutils jq vim \
+         curl dnsutils jq openjdk-8-jre vim \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
