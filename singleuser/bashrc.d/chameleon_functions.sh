@@ -70,6 +70,24 @@ lease_list_reservations() {
 }
 export -f lease_list_reservations
 
+# key_pair_upload [KEYPAIR_NAME]
+#
+# Uploads the public key at ~/.ssh/id_rsa.pub as a new key pair titled
+# KEYPAIR_NAME. Will first check if a key pair already exists with this name.
+# Will not override existing key pairs.
+#
+# Example:
+#   # Creates a new key pair 'my-keypair' with public key from ~/.ssh/id_rsa.pub
+#   key_pair_upload my-keypair
+#
+key_pair_upload() {
+  local keypair_name="${1:-$USER-jupyter}"
+
+  openstack keypair show "$keypair_name" 2>/dev/null \
+    || openstack keypair create --public-key "/work/.ssh/id_rsa.pub" "$keypair_name"
+}
+export -f key_pair_upload
+
 # Wait helpers
 
 wait_ssh() {
@@ -99,3 +117,12 @@ wait_instance() {
     && echo "Instance created successfully!"
 }
 export -f wait_instance
+
+wait_stack() {
+  local stack="$1"
+  local timeout="${2:-1800}"
+  echo "Waiting up to $timeout seconds for stack $stack to start"
+  timeout $timeout bash -c 'until [[ $(openstack stack show $0 -f value -c stack_status) == "CREATE_COMPLETE" ]]; do sleep 1; done' "$stack" \
+    && echo "Stack started successfully!"
+}
+export -f wait_stack

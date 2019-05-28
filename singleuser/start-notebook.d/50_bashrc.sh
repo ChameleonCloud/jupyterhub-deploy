@@ -1,4 +1,4 @@
-if ! grep -q "bashrc.d includes" ~/.bashrc.d; then
+if ! grep -q "bashrc.d includes" ~/.bashrc; then
   cat >> ~/.bashrc <<'EOF'
 
 # bashrc.d includes
