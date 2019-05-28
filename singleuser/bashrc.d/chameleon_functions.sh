@@ -51,6 +51,25 @@ lease_server_create_default_args() {
 }
 export -f lease_server_create_default_args
 
+# lease_list_reservations LEASE
+#
+# Returns a JSON-encoded list of reservation objects. This can be then filtered
+# further by using `jq` or some other JSON processor. This function is provided
+# because the "reservations" property of a lease is a nested JSON document,
+# which can be confusing to deal with.
+#
+# Example:
+#   # List all reservations of type "physical:host"
+#   jq 'map(select(.resource_type="physical:host"))' <(lease_list_reservations my-lease)
+#
+lease_list_reservations() {
+  local lease="$1"
+
+  blazar lease-show "$lease" -f json \
+    | jq -r '.reservations' | jq -s .
+}
+export -f lease_list_reservations
+
 # Wait helpers
 
 wait_ssh() {
