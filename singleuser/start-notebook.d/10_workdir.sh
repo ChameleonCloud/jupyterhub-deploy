@@ -6,7 +6,7 @@ notebooks_dir=/work/notebooks
 if [[ ! -d "$notebooks_dir" ]]; then
   git clone https://github.com/chameleoncloud/notebooks.git "$notebooks_dir"
 else
-  (cd "$notebooks_dir" && git pull || true)
+  (cd "$notebooks_dir" && git stash && git pull && git stash pop || true)
 fi
 
 # Our volume mount is at the root directory, link it in to the user's
