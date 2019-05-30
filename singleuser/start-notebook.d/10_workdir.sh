@@ -4,7 +4,7 @@ rsync -aq /etc/jupyter/serverroot/ /work/
 # Check out community notebooks
 notebooks_dir=/work/notebooks
 if [[ ! -d "$notebooks_dir" ]]; then
-  git clone https://github.com/chameleoncloud/notebooks.git "$notebooks_dir"
+  git clone https://github.com/ChameleonCloud/notebooks.git "$notebooks_dir"
 else
   (cd "$notebooks_dir" && git stash && git pull && git stash pop || true)
 fi
