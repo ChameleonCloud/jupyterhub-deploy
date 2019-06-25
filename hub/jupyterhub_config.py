@@ -5,9 +5,6 @@
 import os
 import sys
 
-#MAXINE: add time
-from datetime import datetime
-
 c = get_config()
 
 server_idle_timeout = 60 * 60 * 24
@@ -18,8 +15,7 @@ kernel_idle_timeout = 60 * 60 * 2
 # Logging
 ##################
 
-#MAXINE: changed log level from 'INFO' to 'DEBUG'
-c.Application.log_level = 'DEBUG'
+c.Application.log_level = 'INFO'
 c.JupyterHub.log_level = 'INFO'
 c.Spawner.debug = False
 c.DockerSpawner.debug = False
@@ -71,23 +67,15 @@ notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
 # This directory will be symlinked to the `notebook_dir` at runtime.
 c.DockerSpawner.notebook_dir = '~/work'
 
-#MAXINE: added if statement and imported variable
-#imported = (os.environ.get('IS_IMPORTED') == 'yes')
+# MAXINE: added imported variable
 imported = False
 
-#MAXINE: added to see what on earth is happening
-with open("importlog.txt", "a") as f:
-    f.write("["+str(datetime.now())+"]: "+str(imported)+"\n")
-# current = os.environ.get('MK_TEST')
-# os.environ['MK_TEST'] = str(current) + "1"
-
-# this was originally in there
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container
-# c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
-#MAXINE: commented out above line, added below line
+# MAXINE: adjusted to take files from the correct server
 c.DockerSpawner.volumes = { 'jupyterhub-user-{username}-{servername}': notebook_dir }
 
+# MAXINE: added if statement
 if not imported:
     # MAXINE: moved this from "1"
     c.DockerSpawner.environment = {

@@ -13,7 +13,7 @@ fi
 # home directory for convenience.
 rm -rf /home/jovyan/work && ln -s /work /home/jovyan/work
 
-# MAXINE: added the following 7 lines that're probably broken
+# MAXINE: added the lines below to clone a git repo into the work directory
 experiment_dir=~/work/experiments
 git_repo=https://github.com/eka-foundation/numerical-computing-is-fun.git
 
