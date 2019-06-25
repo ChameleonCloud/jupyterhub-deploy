@@ -68,7 +68,8 @@ notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
 c.DockerSpawner.notebook_dir = '~/work'
 
 # MAXINE: added imported variable
-imported = False
+imported = True
+clone_url = 'https://github.com/eka-foundation/numerical-computing-is-fun.git'
 
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container
@@ -97,6 +98,8 @@ else:
         'JUPYTER_ENABLE_LAB': 'yes',
         # Note that git clone should happen
         'IS_IMPORTED' : 'yes',
+        # Set git repo
+        'CLONE_URL' : clone_url,
     }
    
 # Remove containers once they are stopped

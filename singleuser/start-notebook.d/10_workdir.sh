@@ -15,10 +15,9 @@ rm -rf /home/jovyan/work && ln -s /work /home/jovyan/work
 
 # MAXINE: added the lines below to clone a git repo into the work directory
 experiment_dir=~/work/experiments
-git_repo=https://github.com/eka-foundation/numerical-computing-is-fun.git
 
 if [[ "$IS_IMPORTED" = "yes" ]]; then
    cd work 
-   git clone $git_repo
+   git clone $CLONE_URL
    cd ..
 fi
