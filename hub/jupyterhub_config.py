@@ -5,6 +5,9 @@
 import os
 import sys
 
+#MAXINE: add time
+from datetime import datetime
+
 c = get_config()
 
 server_idle_timeout = 60 * 60 * 24
@@ -15,7 +18,8 @@ kernel_idle_timeout = 60 * 60 * 2
 # Logging
 ##################
 
-c.Application.log_level = 'INFO'
+#MAXINE: changed log level from 'INFO' to 'DEBUG'
+c.Application.log_level = 'DEBUG'
 c.JupyterHub.log_level = 'INFO'
 c.Spawner.debug = False
 c.DockerSpawner.debug = False
@@ -40,42 +44,81 @@ origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
 c.Spawner.pre_spawn_hook = pre_spawn_hook
 c.Spawner.mem_limit = '2G'
+c.Spawner.http_timeout = 120
 
 ##################
 # Docker spawner
 ##################
+
+# MAXINE: Adjust server names to avoid container conflicts
+c.DockerSpawner.name_template = '{prefix}-{username}-{servername}'
 
 # Spawn single-user servers as Docker containers
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 
 # Spawn containers from this image
 c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
+
 # Connect containers to this Docker network
 network_name = os.environ['DOCKER_NETWORK_NAME']
 c.DockerSpawner.use_internal_ip = True
 c.DockerSpawner.network_name = network_name
+
 # Pass the network name as argument to spawned containers
 c.DockerSpawner.extra_host_config = { 'network_mode': network_name }
 notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
+
 # This directory will be symlinked to the `notebook_dir` at runtime.
 c.DockerSpawner.notebook_dir = '~/work'
+
+#MAXINE: added if statement and imported variable
+#imported = (os.environ.get('IS_IMPORTED') == 'yes')
+imported = False
+
+#MAXINE: added to see what on earth is happening
+with open("importlog.txt", "a") as f:
+    f.write("["+str(datetime.now())+"]: "+str(imported)+"\n")
+# current = os.environ.get('MK_TEST')
+# os.environ['MK_TEST'] = str(current) + "1"
+
+# this was originally in there
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container
-c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
+# c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
+#MAXINE: commented out above line, added below line
+c.DockerSpawner.volumes = { 'jupyterhub-user-{username}-{servername}': notebook_dir }
+
+if not imported:
+    # MAXINE: moved this from "1"
+    c.DockerSpawner.environment = {
+        'CHOWN_EXTRA': notebook_dir,
+        'CHOWN_EXTRA_OPTS': '-R',
+        # Allow users to have sudo access within their container
+        'GRANT_SUDO': 'yes',
+        # Enable JupyterLab application
+        'JUPYTER_ENABLE_LAB': 'yes',
+    }
+else:
+    # MAXINE: modified this, which I moved from "1"
+    c.DockerSpawner.environment = {
+        'CHOWN_EXTRA': notebook_dir,
+        'CHOWN_EXTRA_OPTS': '-R',
+        # Allow users to have sudo access within their container
+        'GRANT_SUDO': 'yes',
+        # Enable JupyterLab application
+        'JUPYTER_ENABLE_LAB': 'yes',
+        # Note that git clone should happen
+        'IS_IMPORTED' : 'yes',
+    }
+   
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
 c.DockerSpawner.extra_create_kwargs.update({
     # Need to launch the container as root in order to grant sudo access
     'user': 'root'
 })
-c.DockerSpawner.environment = {
-    'CHOWN_EXTRA': notebook_dir,
-    'CHOWN_EXTRA_OPTS': '-R',
-    # Allow users to have sudo access within their container
-    'GRANT_SUDO': 'yes',
-    # Enable JupyterLab application
-    'JUPYTER_ENABLE_LAB': 'yes',
-}
+# 1
+
 c.DockerSpawner.cmd = [
     'start-notebook.sh',
     '--NotebookApp.shutdown_no_activity_timeout={}'.format(server_idle_timeout),
@@ -105,6 +148,9 @@ c.JupyterHub.cookie_max_age_days = 7
 ##################
 # Hub
 ##################
+
+# MAXINE: Allow named servers 
+c.JupyterHub.allow_named_servers = True
 
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = 'jupyterhub'
