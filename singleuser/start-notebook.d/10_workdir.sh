@@ -2,7 +2,7 @@
 rsync -aq /etc/jupyter/serverroot/ /work/
 
 # Check out community notebooks if not imported
-if [[ "$IS_IMPORTED" = "yes" ]]; then
+if [[ "$IS_IMPORTED" = "no" ]]; then
     notebooks_dir=/work/notebooks
     if [[ ! -d "$notebooks_dir" ]]; then
       git clone https://github.com/chameleoncloud/notebooks.git "$notebooks_dir"

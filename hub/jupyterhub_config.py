@@ -27,25 +27,26 @@ c.DockerSpawner.debug = False
 # MAXINE: added spawner wrapper
 class DemoFormSpawner(DockerSpawner):
     def _options_form_default(self):
-        default_stack = "jupyter/minimal-notebook"
+        default_stack = "zenodo"
+        default_imp = "yes"
         return """
+        <label for="imported">Are you importing an experiment?</label>
+        <select name="imported" size="1">
+        <option value="no"> No </option>
+        <option value="yes"> Yes </option>
+        </select>
         <label for="stack">Select your desired source</label>
         <select name="source" size="1">
         <option value="git"> Git </option>
         <option value="zenodo"> Zenodo </option>
         </select>
-        """.format(stack=default_stack)
+        """.format(imported=default_imp,stack=default_stack)
 
     def options_from_form(self, formdata):
         options = {}
         options['source'] = formdata['source']
-        '''
-        source = ''.join(options['source'])
-        cmd0 = "echo 'looking for source'"
-        cmd1 = "echo '"+source+"'"
-        os.system(cmd0)
-        os.system(cmd1)
-        '''
+        options['imported'] = formdata['imported']
+        
         return options
 #        container_image = ''.join(formdata['stack'])
 #        print("SPAWN: " + container_image + " IMAGE" )
@@ -72,14 +73,16 @@ from subprocess import check_call
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
     # MAXINE: added import variables
-    imported = True
 #    source = 'git'
     # temporarily hard-coded sources
 
     source = ''.join(spawner.user_options['source'])
-    cmd = "echo 'looking for source in pre-spawn hook'"
+    imported = ''.join(spawner.user_options['imported'])
+    cmd = "echo 'looking for source, imported in pre-spawn hook'"
     os.system(cmd)
     cmd = "echo '"+source+"'"
+    os.system(cmd)
+    cmd = "echo '"+imported+"'"
     os.system(cmd)
     clone_url = 'https://github.com/eka-foundation/numerical-computing-is-fun.git'
     zen_url = 'https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip'
@@ -92,7 +95,7 @@ def pre_spawn_hook(spawner):
     spawner.environment['OS_PROJECT_DOMAIN_NAME'] = 'default'
     spawner.environment['OS_REGION_NAME'] = 'CHI@UC'
     # Indicates if cloning/downloading needs to occur
-    spawner.environment['IS_IMPORTED'] = 'yes'
+    spawner.environment['IS_IMPORTED'] = imported
     # Set git repo
     spawner.environment['CLONE_URL'] = clone_url
     # Set Zenodo source
