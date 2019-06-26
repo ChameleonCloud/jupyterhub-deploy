@@ -27,6 +27,12 @@ c.DockerSpawner.debug = False
 from subprocess import check_call
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
+    # MAXINE: added import variables
+    imported = True
+    source = 'git'
+    # temporarily hard-coded sources
+    clone_url = 'https://github.com/eka-foundation/numerical-computing-is-fun.git'
+    zen_url = 'https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip'
     username = spawner.user.name
     # Run as authenticated user
     spawner.environment['NB_USER'] = username
@@ -35,6 +41,14 @@ def pre_spawn_hook(spawner):
     spawner.environment['OS_KEYPAIR_PUBLIC_KEY'] = '/home/{}/.ssh/id_rsa.pub'.format(username)
     spawner.environment['OS_PROJECT_DOMAIN_NAME'] = 'default'
     spawner.environment['OS_REGION_NAME'] = 'CHI@UC'
+    # Indicates if cloning/downloading needs to occur
+    spawner.environment['IS_IMPORTED'] = 'yes'
+    # Set git repo
+    spawner.environment['CLONE_URL'] = clone_url
+    # Set Zenodo source
+    spawner.environment['ZEN_ZIP'] = zen_url
+    # Set source
+    spawner.environment['IMPORT_SRC'] = source
 
 origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
@@ -67,46 +81,11 @@ notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
 # This directory will be symlinked to the `notebook_dir` at runtime.
 c.DockerSpawner.notebook_dir = '~/work'
 
-# MAXINE: added imported variable
-imported = True
-source = 'git'
-clone_url = 'https://github.com/eka-foundation/numerical-computing-is-fun.git'
-zen_url = 'https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip'
-
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container
 # MAXINE: adjusted to take files from the correct server
 c.DockerSpawner.volumes = { 'jupyterhub-user-{username}-{servername}': notebook_dir }
 
-# MAXINE: added if statement
-if not imported:
-    # MAXINE: moved this from "1"
-    c.DockerSpawner.environment = {
-        'CHOWN_EXTRA': notebook_dir,
-        'CHOWN_EXTRA_OPTS': '-R',
-        # Allow users to have sudo access within their container
-        'GRANT_SUDO': 'yes',
-        # Enable JupyterLab application
-        'JUPYTER_ENABLE_LAB': 'yes',
-    }
-else:
-    # MAXINE: modified this, which I moved from "1"
-    c.DockerSpawner.environment = {
-        'CHOWN_EXTRA': notebook_dir,
-        'CHOWN_EXTRA_OPTS': '-R',
-        # Allow users to have sudo access within their container
-        'GRANT_SUDO': 'yes',
-        # Enable JupyterLab application
-        'JUPYTER_ENABLE_LAB': 'yes',
-        # Note that git clone should happen
-        'IS_IMPORTED' : 'yes',
-        # Set git repo
-         'CLONE_URL' : clone_url,
-        # Set Zenodo source
-         'ZEN_ZIP' : zen_url,
-        # Set source
-        'IMPORT_SRC' : source,
-    }
    
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
@@ -114,7 +93,15 @@ c.DockerSpawner.extra_create_kwargs.update({
     # Need to launch the container as root in order to grant sudo access
     'user': 'root'
 })
-# 1
+
+c.DockerSpawner.environment = {
+    'CHOWN_EXTRA': notebook_dir,
+    'CHOWN_EXTRA_OPTS': '-R',
+    # Allow users to have sudo access within their container
+    'GRANT_SUDO': 'yes',
+    # Enable JupyterLab application
+    'JUPYTER_ENABLE_LAB': 'yes',
+}
 
 c.DockerSpawner.cmd = [
     'start-notebook.sh',
