@@ -8,44 +8,60 @@ from dockerspawner import DockerSpawner
 # MAXINE: added logging
 from tornado.log import app_log
 
-# MAXINE: Moved from #2
-##################
-# Logging
-##################
-
-c.Application.log_level = 'INFO'
-c.JupyterHub.log_level = 'INFO'
-c.Spawner.debug = False
-c.DockerSpawner.debug = False
-
-##################
-# Base spawner
-##################
-
-# source = 'zenodo'
-
+# MAXINE: added to deal with URLs
+import tornado.web
+# from splinter import Browser
+# browser=Browser()
 # MAXINE: added spawner wrapper
+
 class DemoFormSpawner(DockerSpawner):
     def _options_form_default(self):
-        default_stack = "zenodo"
+        default_src = "zenodo"
         default_imp = "yes"
+        default_url = "google.com"
         return """
         <label for="imported">Are you importing an experiment?</label>
-        <select name="imported" size="1">
+        <select id="imported" name="imported" size="1" onchange="console.log(window.location.href)">
         <option value="no"> No </option>
         <option value="yes"> Yes </option>
+        <option value="hello"> hello </option>
         </select>
-        <label for="stack">Select your desired source</label>
-        <select name="source" size="1">
+        <div id = "src_stuff">
+        <label for="source">Select your desired source</label>
+        <select id="source" name="source" size="1">
         <option value="git"> Git </option>
         <option value="zenodo"> Zenodo </option>
         </select>
-        """.format(imported=default_imp,stack=default_stack)
+        <p>
+        <label for="url">Enter the source url</label>
+        <input id = "url" name="url" placeholder="eg:https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip"></input>
+        </p>
+        </div>
+        <script>
+        var query = window.location.search.substring(1);
+        console.log(query)
+        var vars = query.split("&");
+        var pair = vars[0].split("=");
+        console.log(pair[1]);
+        if (pair[0] == "imported")
+            document.getElementById("imported").value = pair[1]
+        var pair = vars[1].split("=");
+        console.log(pair[1]);
+        if (pair[0] == "source")
+            document.getElementById("source").value = pair[1]
+        var pair = vars[2].split("=");
+        console.log(pair[1]);
+        if (pair[0] == "url")
+            document.getElementById("url").value = pair[1]
+        document.getElementsByClassName("btn-jupyter")[0].click()
+        </script>
+        """.format(imported=default_imp,source=default_src,url=default_url)
 
     def options_from_form(self, formdata):
         options = {}
-        options['source'] = formdata['source']
         options['imported'] = formdata['imported']
+        options['source'] = formdata['source']
+        options['url'] = formdata['url']
         
         return options
 #        container_image = ''.join(formdata['stack'])
@@ -59,6 +75,17 @@ else:
     spawner.form_spawner.user_option = options
 
 spawner.user_options = options
+            "if (this.value == "no") {
+                document.getElementById("src_stuff").style.display="none"
+             } else {
+                document.getElementById("src_stuff").style.display="block"
+             }">
+        if(this.value=="no"){\
+        document.getElementById("src_stuff").style.display="none"\
+        }else{\
+        document.getElementById("src_stuff").style.display="block"\
+        }">
+
 '''
 
 
@@ -68,24 +95,54 @@ server_idle_timeout = 60 * 60 * 24
 server_max_age = 60 * 60 * 24 * 7
 kernel_idle_timeout = 60 * 60 * 2
 
-#2
+##################
+# Logging
+##################
+
+c.Application.log_level = 'INFO'
+c.JupyterHub.log_level = 'INFO'
+c.Spawner.debug = False
+c.DockerSpawner.debug = False
+
+##################
+# Base spawner
+##################
+
+
 from subprocess import check_call
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
+    #url = os.environ['HTTP_HOST']
+    #uri = os.environ['REQUEST_URI']
+    #curr_url = url + uri
+    # curr_url = browser.current_url
+    # cmd = "echo 'CURRENT URL: '"
+    # os.system(cmd)
+    # cmd = "echo "+curr_url
+    # os.system(cmd)
     # MAXINE: added import variables
-#    source = 'git'
-    # temporarily hard-coded sources
+    # Variables from options to keep track of imports
+    
 
-    source = ''.join(spawner.user_options['source'])
     imported = ''.join(spawner.user_options['imported'])
-    cmd = "echo 'looking for source, imported in pre-spawn hook'"
-    os.system(cmd)
-    cmd = "echo '"+source+"'"
+    source = ''.join(spawner.user_options['source'])
+    url = ''.join(spawner.user_options['url'])
+
+    # Prints data 
+    cmd = "echo 'looking for imported, source, url in pre-spawn hook'"
     os.system(cmd)
     cmd = "echo '"+imported+"'"
     os.system(cmd)
-    clone_url = 'https://github.com/eka-foundation/numerical-computing-is-fun.git'
-    zen_url = 'https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip'
+    cmd = "echo '"+source+"'"
+    os.system(cmd)
+    cmd = "echo '"+url+"'"
+    os.system(cmd)
+    cmd = "echo '"+str(spawner)+"'"
+    os.system(cmd)
+
+    # clone_url = 'https://github.com/eka-foundation/numerical-computing-is-fun.git'
+    # zen_url = 'https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip'
+
     username = spawner.user.name
     # Run as authenticated user
     spawner.environment['NB_USER'] = username
@@ -96,12 +153,10 @@ def pre_spawn_hook(spawner):
     spawner.environment['OS_REGION_NAME'] = 'CHI@UC'
     # Indicates if cloning/downloading needs to occur
     spawner.environment['IS_IMPORTED'] = imported
-    # Set git repo
-    spawner.environment['CLONE_URL'] = clone_url
-    # Set Zenodo source
-    spawner.environment['ZEN_ZIP'] = zen_url
     # Set source
     spawner.environment['IMPORT_SRC'] = source
+    # Set link
+    spawner.environment['SRC_URL'] = url
 
 
 

@@ -15,19 +15,21 @@ if [[ "$IS_IMPORTED" = "no" ]]; then
     rm -rf /home/jovyan/work && ln -s /work /home/jovyan/work
 fi
 
-# MAXINE: added the lines below to clone a git repo into the work directory
+# MAXINE: added the lines below to clone a git repo or zenodo zip file into the work directory
 experiment_dir=~/work/experiments
 
 if [[ "$IS_IMPORTED" = "yes" ]]; then
     cd work 
     # For Git:
     if [[ "$IMPORT_SRC" = "git" ]]; then
-        git clone $CLONE_URL
+        git clone $SRC_URL
     # For Zenodo:
     else
-        wget $ZEN_ZIP 
+        wget $SRC_URL 
         unzip '*.zip'
         rm *.zip       
+        tar xzf '*.tar.gz'
+        rm *.tar.gz
     fi
     cd ..
 fi
