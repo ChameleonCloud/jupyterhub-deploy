@@ -69,7 +69,9 @@ c.DockerSpawner.notebook_dir = '~/work'
 
 # MAXINE: added imported variable
 imported = True
+source = 'git'
 clone_url = 'https://github.com/eka-foundation/numerical-computing-is-fun.git'
+zen_url = 'https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip'
 
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container
@@ -99,7 +101,11 @@ else:
         # Note that git clone should happen
         'IS_IMPORTED' : 'yes',
         # Set git repo
-        'CLONE_URL' : clone_url,
+         'CLONE_URL' : clone_url,
+        # Set Zenodo source
+         'ZEN_ZIP' : zen_url,
+        # Set source
+        'IMPORT_SRC' : source,
     }
    
 # Remove containers once they are stopped
