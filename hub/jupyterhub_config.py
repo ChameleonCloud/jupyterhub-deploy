@@ -53,7 +53,7 @@ class DemoFormSpawner(DockerSpawner):
         console.log(pair[1]);
         if (pair[0] == "url")
             document.getElementById("url").value = pair[1]
-        document.getElementsByClassName("btn-jupyter")[0].click()
+        document.getElementById("spawn_form").submit()
         </script>
         """.format(imported=default_imp,source=default_src,url=default_url)
 
