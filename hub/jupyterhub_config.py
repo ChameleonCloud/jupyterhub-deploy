@@ -4,13 +4,11 @@
 # Configuration file for JupyterHub
 import os
 import sys
+from dockerspawner import DockerSpawner
+# MAXINE: added logging
+from tornado.log import app_log
 
-c = get_config()
-
-server_idle_timeout = 60 * 60 * 24
-server_max_age = 60 * 60 * 24 * 7
-kernel_idle_timeout = 60 * 60 * 2
-
+# MAXINE: Moved from #2
 ##################
 # Logging
 ##################
@@ -24,13 +22,65 @@ c.DockerSpawner.debug = False
 # Base spawner
 ##################
 
+# source = 'zenodo'
+
+# MAXINE: added spawner wrapper
+class DemoFormSpawner(DockerSpawner):
+    def _options_form_default(self):
+        default_stack = "jupyter/minimal-notebook"
+        return """
+        <label for="stack">Select your desired source</label>
+        <select name="source" size="1">
+        <option value="git"> Git </option>
+        <option value="zenodo"> Zenodo </option>
+        </select>
+        """.format(stack=default_stack)
+
+    def options_from_form(self, formdata):
+        options = {}
+        options['source'] = formdata['source']
+        '''
+        source = ''.join(options['source'])
+        cmd0 = "echo 'looking for source'"
+        cmd1 = "echo '"+source+"'"
+        os.system(cmd0)
+        os.system(cmd1)
+        '''
+        return options
+#        container_image = ''.join(formdata['stack'])
+#        print("SPAWN: " + container_image + " IMAGE" )
+#        self.container_image = container_image
+# MAXINE: added this whole section
+'''
+if options is None:
+    options = spawner.form_spawner.user_options or {}
+else:
+    spawner.form_spawner.user_option = options
+
+spawner.user_options = options
+'''
+
+
+c = get_config()
+
+server_idle_timeout = 60 * 60 * 24
+server_max_age = 60 * 60 * 24 * 7
+kernel_idle_timeout = 60 * 60 * 2
+
+#2
 from subprocess import check_call
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
     # MAXINE: added import variables
     imported = True
-    source = 'git'
+#    source = 'git'
     # temporarily hard-coded sources
+
+    source = ''.join(spawner.user_options['source'])
+    cmd = "echo 'looking for source in pre-spawn hook'"
+    os.system(cmd)
+    cmd = "echo '"+source+"'"
+    os.system(cmd)
     clone_url = 'https://github.com/eka-foundation/numerical-computing-is-fun.git'
     zen_url = 'https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip'
     username = spawner.user.name
@@ -50,11 +100,15 @@ def pre_spawn_hook(spawner):
     # Set source
     spawner.environment['IMPORT_SRC'] = source
 
+
+
+
 origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
 c.Spawner.pre_spawn_hook = pre_spawn_hook
 c.Spawner.mem_limit = '2G'
 c.Spawner.http_timeout = 120
+
 
 ##################
 # Docker spawner
@@ -64,7 +118,9 @@ c.Spawner.http_timeout = 120
 c.DockerSpawner.name_template = '{prefix}-{username}-{servername}'
 
 # Spawn single-user servers as Docker containers
-c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+# c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+# MAXINE: replaced above with below
+c.JupyterHub.spawner_class = DemoFormSpawner
 
 # Spawn containers from this image
 c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
