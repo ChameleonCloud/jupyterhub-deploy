@@ -34,3 +34,10 @@ if [[ "$IS_IMPORTED" = "yes" ]]; then
     fi
     cd ..
 fi
+
+cd work/*/
+if [[ -f "requirements.txt" ]]; then
+    python3 -m pip install -r "requirements.txt"
+fi
+cd ../..
+

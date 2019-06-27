@@ -129,7 +129,7 @@ origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
 c.Spawner.pre_spawn_hook = pre_spawn_hook
 c.Spawner.mem_limit = '2G'
-c.Spawner.http_timeout = 120
+c.Spawner.http_timeout = 600
 
 
 ##################
