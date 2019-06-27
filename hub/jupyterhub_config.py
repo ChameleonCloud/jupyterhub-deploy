@@ -4,7 +4,14 @@
 # Configuration file for JupyterHub
 import os
 import sys
+import urllib
+import time
+from urllib.parse import parse_qsl
 from dockerspawner import DockerSpawner
+from jupyterhub.handlers import BaseHandler
+from jupyterhub.utils import url_path_join
+from tornado import web
+from tornado.httputil import url_concat
 
 # Spawner wrapper to create server options
 class DemoFormSpawner(DockerSpawner):
@@ -37,6 +44,7 @@ class DemoFormSpawner(DockerSpawner):
         var vars = query.split("&");
         if (vars.length != 3)
             vars = ["imported=no","source=git", "url=none"]
+        console.log(vars);
         var pair = vars[0].split("=");
         if (pair[0] == "imported")
             document.getElementById("imported").value = pair[1]
@@ -84,8 +92,7 @@ from subprocess import check_call
 def pre_spawn_hook(spawner):
     imported = ''.join(spawner.user_options['imported'])
     source = ''.join(spawner.user_options['source'])
-    url = ''.join(spawner.user_options['url'])
-
+    url = urllib.parse.unquote(''.join(spawner.user_options['url']))
     # Prints data 
     cmd = "echo 'looking for imported, source, url in pre-spawn hook'"
     os.system(cmd)
@@ -246,3 +253,38 @@ with open(os.path.join(pwd, 'adminlist')) as f:
         if not line:
             continue
         admin.add(line.strip())
+
+
+##################
+# Handlers
+##################
+
+class UserRedirectExperimentHandler(BaseHandler):
+    """Redirect spawn requests to user servers.
+    /import/ will spawn a new experiment server
+    If the user is not logged in, send to login URL, redirecting back here.
+    Added by: Maxine
+    """
+
+    @web.authenticated
+    def get(self, path):
+        cmd = "echo 'hello"+path+"'"
+        os.system(cmd)
+        user = self.current_user
+        user_url = url_path_join(user.url, path)
+        if self.request.query:
+            user_url = url_concat(user_url, parse_qsl(self.request.query))
+
+        url = url_concat(
+            url_path_join(self.hub.base_url, "spawn", user.name), {"next": user_url}
+        )
+        url = url.replace("exp_name","experiment"+str(int(time.time())),1)
+        url = url.replace("user","hub/spawn",1)
+
+        self.redirect(url)
+
+c.JupyterHub.extra_handlers = [
+    (r'/import/(.*)?', UserRedirectExperimentHandler),
+]
+
+
