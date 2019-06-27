@@ -5,15 +5,8 @@
 import os
 import sys
 from dockerspawner import DockerSpawner
-# MAXINE: added logging
-from tornado.log import app_log
 
-# MAXINE: added to deal with URLs
-import tornado.web
-# from splinter import Browser
-# browser=Browser()
-# MAXINE: added spawner wrapper
-
+# Spawner wrapper to create server options
 class DemoFormSpawner(DockerSpawner):
     def _options_form_default(self):
         default_src = "zenodo"
@@ -21,7 +14,7 @@ class DemoFormSpawner(DockerSpawner):
         default_url = "google.com"
         return """
         <p> Loading your custom options... please wait... </p>
-        <div id = "hidden_form">
+        <div id ="hidden_form" style="display:none">
         <label for="imported">Are you importing an experiment?</label>
         <select id="imported" name="imported" size="1" onchange="console.log(window.location.href)">
         <option value="no"> No </option>
@@ -39,25 +32,21 @@ class DemoFormSpawner(DockerSpawner):
         </p>
         </div>
         <script>
-        document.getElementById("hidden_form").style.display = "none"
         var query = window.location.search.substring(1);
         console.log(query)
         var vars = query.split("&");
         if (vars.length != 3)
             vars = ["imported=no","source=git", "url=none"]
-
         var pair = vars[0].split("=");
-        console.log(pair[1]);
         if (pair[0] == "imported")
             document.getElementById("imported").value = pair[1]
         var pair = vars[1].split("=");
-        console.log(pair[1]);
         if (pair[0] == "source")
             document.getElementById("source").value = pair[1]
         var pair = vars[2].split("=");
-        console.log(pair[1]);
         if (pair[0] == "url")
             document.getElementById("url").value = pair[1]
+
         document.getElementById("spawn_form").submit()
         </script>
         """.format(imported=default_imp,source=default_src,url=default_url)
@@ -69,30 +58,6 @@ class DemoFormSpawner(DockerSpawner):
         options['url'] = formdata['url']
         
         return options
-#        container_image = ''.join(formdata['stack'])
-#        print("SPAWN: " + container_image + " IMAGE" )
-#        self.container_image = container_image
-# MAXINE: added this whole section
-'''
-if options is None:
-    options = spawner.form_spawner.user_options or {}
-else:
-    spawner.form_spawner.user_option = options
-
-spawner.user_options = options
-            "if (this.value == "no") {
-                document.getElementById("src_stuff").style.display="none"
-             } else {
-                document.getElementById("src_stuff").style.display="block"
-             }">
-        if(this.value=="no"){\
-        document.getElementById("src_stuff").style.display="none"\
-        }else{\
-        document.getElementById("src_stuff").style.display="block"\
-        }">
-
-'''
-
 
 c = get_config()
 
@@ -117,18 +82,6 @@ c.DockerSpawner.debug = False
 from subprocess import check_call
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
-    #url = os.environ['HTTP_HOST']
-    #uri = os.environ['REQUEST_URI']
-    #curr_url = url + uri
-    # curr_url = browser.current_url
-    # cmd = "echo 'CURRENT URL: '"
-    # os.system(cmd)
-    # cmd = "echo "+curr_url
-    # os.system(cmd)
-    # MAXINE: added import variables
-    # Variables from options to keep track of imports
-    
-
     imported = ''.join(spawner.user_options['imported'])
     source = ''.join(spawner.user_options['source'])
     url = ''.join(spawner.user_options['url'])
@@ -145,9 +98,6 @@ def pre_spawn_hook(spawner):
     cmd = "echo '"+str(spawner)+"'"
     os.system(cmd)
 
-    # clone_url = 'https://github.com/eka-foundation/numerical-computing-is-fun.git'
-    # zen_url = 'https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip'
-
     username = spawner.user.name
     # Run as authenticated user
     spawner.environment['NB_USER'] = username
@@ -163,9 +113,6 @@ def pre_spawn_hook(spawner):
     # Set link
     spawner.environment['SRC_URL'] = url
 
-
-
-
 origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
 c.Spawner.pre_spawn_hook = pre_spawn_hook
@@ -177,12 +124,10 @@ c.Spawner.http_timeout = 120
 # Docker spawner
 ##################
 
-# MAXINE: Adjust server names to avoid container conflicts
+# Set spawner names to work for multiple servers
 c.DockerSpawner.name_template = '{prefix}-{username}-{servername}'
 
-# Spawn single-user servers as Docker containers
-# c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
-# MAXINE: replaced above with below
+# Spawn single-user servers as Docker containers wrapped by the option form
 c.JupyterHub.spawner_class = DemoFormSpawner
 
 # Spawn containers from this image
@@ -201,8 +146,7 @@ notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
 c.DockerSpawner.notebook_dir = '~/work'
 
 # Mount the real user's Docker volume on the host to the
-# notebook directory in the container
-# MAXINE: adjusted to take files from the correct server
+# notebook directory in the container for that server
 c.DockerSpawner.volumes = { 'jupyterhub-user-{username}-{servername}': notebook_dir }
 
    
@@ -252,7 +196,7 @@ c.JupyterHub.cookie_max_age_days = 7
 # Hub
 ##################
 
-# MAXINE: Allow named servers 
+# Allow named servers 
 c.JupyterHub.allow_named_servers = True
 
 # User containers will access hub by container name on the Docker network
