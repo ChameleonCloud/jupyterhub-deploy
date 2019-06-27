@@ -20,12 +20,13 @@ experiment_dir=~/work/experiments
 
 if [[ "$IS_IMPORTED" = "yes" ]]; then
     cd work 
+    # SRC_PATH is what comes after.com/ or .org/
     # For Git:
     if [[ "$IMPORT_SRC" = "git" ]]; then
-        git clone $SRC_URL
+        git clone http://github.com/$SRC_PATH
     # For Zenodo:
     else
-        wget $SRC_URL 
+        wget https://zenodo.org/$SRC_PATH
         unzip '*.zip'
         rm *.zip       
         tar xzf '*.tar.gz'

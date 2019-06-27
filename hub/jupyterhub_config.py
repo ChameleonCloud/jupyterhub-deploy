@@ -18,7 +18,7 @@ class DemoFormSpawner(DockerSpawner):
     def _options_form_default(self):
         default_src = "zenodo"
         default_imp = "yes"
-        default_url = "google.com"
+        default_src_path = "google.com"
         return """
         <p> Loading your custom options... please wait... </p>
         <div id ="hidden_form" style="display:none">
@@ -34,8 +34,8 @@ class DemoFormSpawner(DockerSpawner):
         <option value="zenodo"> Zenodo </option>
         </select>
         <p>
-        <label for="url">Enter the source url</label>
-        <input id = "url" name="url" placeholder="eg:https://zenodo.org/record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip"></input>
+        <label for="src_path">Enter the source path</label>
+        <input id = "src_path" name="src_path" placeholder="eg:record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip"></input>
         </p>
         </div>
         <script>
@@ -43,7 +43,7 @@ class DemoFormSpawner(DockerSpawner):
         console.log(query)
         var vars = query.split("&");
         if (vars.length != 3)
-            vars = ["imported=no","source=git", "url=none"]
+            vars = ["imported=no","source=git", "src_path=none"]
         console.log(vars);
         var pair = vars[0].split("=");
         if (pair[0] == "imported")
@@ -52,18 +52,18 @@ class DemoFormSpawner(DockerSpawner):
         if (pair[0] == "source")
             document.getElementById("source").value = pair[1]
         var pair = vars[2].split("=");
-        if (pair[0] == "url")
-            document.getElementById("url").value = pair[1]
+        if (pair[0] == "src_path")
+            document.getElementById("src_path").value = pair[1]
 
         document.getElementById("spawn_form").submit()
         </script>
-        """.format(imported=default_imp,source=default_src,url=default_url)
+        """.format(imported=default_imp,source=default_src,src_path=default_src_path)
 
     def options_from_form(self, formdata):
         options = {}
         options['imported'] = formdata['imported']
         options['source'] = formdata['source']
-        options['url'] = formdata['url']
+        options['src_path'] = formdata['src_path']
         
         return options
 
@@ -92,15 +92,15 @@ from subprocess import check_call
 def pre_spawn_hook(spawner):
     imported = ''.join(spawner.user_options['imported'])
     source = ''.join(spawner.user_options['source'])
-    url = urllib.parse.unquote(''.join(spawner.user_options['url']))
+    src_path = urllib.parse.unquote(''.join(spawner.user_options['src_path']))
     # Prints data 
-    cmd = "echo 'looking for imported, source, url in pre-spawn hook'"
+    cmd = "echo 'looking for imported, source, src_path in pre-spawn hook'"
     os.system(cmd)
     cmd = "echo '"+imported+"'"
     os.system(cmd)
     cmd = "echo '"+source+"'"
     os.system(cmd)
-    cmd = "echo '"+url+"'"
+    cmd = "echo '"+src_path+"'"
     os.system(cmd)
     cmd = "echo '"+str(spawner)+"'"
     os.system(cmd)
@@ -118,7 +118,7 @@ def pre_spawn_hook(spawner):
     # Set source
     spawner.environment['IMPORT_SRC'] = source
     # Set link
-    spawner.environment['SRC_URL'] = url
+    spawner.environment['SRC_PATH'] = src_path
 
 origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
