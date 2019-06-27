@@ -5,13 +5,18 @@
 import os
 import sys
 import urllib
-import time
-from urllib.parse import parse_qsl
+import hashlib
+
+from urllib.parse import parse_qsl,parse_qs,urlparse
 from dockerspawner import DockerSpawner
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.utils import url_path_join
 from tornado import web
 from tornado.httputil import url_concat
+
+def myPrint(label,item):
+    cmd = "echo '"+label+": "+item+"'"
+    os.system(cmd)
 
 # Spawner wrapper to create server options
 class DemoFormSpawner(DockerSpawner):
@@ -269,14 +274,26 @@ class UserRedirectExperimentHandler(BaseHandler):
 
     @web.authenticated
     def get(self, path):
-        # Get current user
-        user = self.current_user
-        # Generate and include server name
-        path = path.replace("exp_name","experiment"+str(int(time.time())),1)
 
+        user = self.current_user
         spawn_url = url_path_join("/hub/spawn/",user.name,path)
+
         if self.request.query:
-            spawn_url = url_concat(spawn_url, parse_qsl(self.request.query))
+            query_list = parse_qsl(self.request.query)
+            spawn_url = url_concat(spawn_url, query_list)
+
+            # Generate and include server name
+            try:
+                src_path = query_list[2][1]
+                myPrint("src_path",src_path)
+                server_name = (
+                    hashlib.sha256(src_path.encode('utf-8'))
+                    .hexdigest()[:7]
+                )
+                spawn_url = spawn_url.replace("exp_name",server_name,1)
+            except IndexError:
+                # Empty if none provided
+                spawn_url = url_path_join("/user/",user.name) 
 
         url = url_concat(
             url_path_join(self.hub.base_url, "spawn", user.name), {"next": spawn_url}
