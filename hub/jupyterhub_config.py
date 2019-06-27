@@ -261,26 +261,26 @@ with open(os.path.join(pwd, 'adminlist')) as f:
 
 class UserRedirectExperimentHandler(BaseHandler):
     """Redirect spawn requests to user servers.
-    /import/ will spawn a new experiment server
+    /import/exp_name?{query vars} will spawn a new experiment server
+    Server will be initialized with a git repo/zenodo zip file as specified
     If the user is not logged in, send to login URL, redirecting back here.
     Added by: Maxine
     """
 
     @web.authenticated
     def get(self, path):
-        cmd = "echo 'hello"+path+"'"
-        os.system(cmd)
+        # Get current user
         user = self.current_user
-        user_url = url_path_join(user.url, path)
+        # Generate and include server name
+        path = path.replace("exp_name","experiment"+str(int(time.time())),1)
+
+        spawn_url = url_path_join("/hub/spawn/",user.name,path)
         if self.request.query:
-            user_url = url_concat(user_url, parse_qsl(self.request.query))
+            spawn_url = url_concat(spawn_url, parse_qsl(self.request.query))
 
         url = url_concat(
-            url_path_join(self.hub.base_url, "spawn", user.name), {"next": user_url}
+            url_path_join(self.hub.base_url, "spawn", user.name), {"next": spawn_url}
         )
-        url = url.replace("exp_name","experiment"+str(int(time.time())),1)
-        url = url.replace("user","hub/spawn",1)
-
         self.redirect(url)
 
 c.JupyterHub.extra_handlers = [
