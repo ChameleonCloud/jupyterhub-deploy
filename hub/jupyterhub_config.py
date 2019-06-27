@@ -20,13 +20,14 @@ class DemoFormSpawner(DockerSpawner):
         default_imp = "yes"
         default_url = "google.com"
         return """
+        <p> Loading your custom options... please wait... </p>
+        <div id = "hidden_form">
         <label for="imported">Are you importing an experiment?</label>
         <select id="imported" name="imported" size="1" onchange="console.log(window.location.href)">
         <option value="no"> No </option>
         <option value="yes"> Yes </option>
         <option value="hello"> hello </option>
         </select>
-        <div id = "src_stuff">
         <label for="source">Select your desired source</label>
         <select id="source" name="source" size="1">
         <option value="git"> Git </option>
@@ -38,9 +39,13 @@ class DemoFormSpawner(DockerSpawner):
         </p>
         </div>
         <script>
+        document.getElementById("hidden_form").style.display = "none"
         var query = window.location.search.substring(1);
         console.log(query)
         var vars = query.split("&");
+        if (vars.length != 3)
+            vars = ["imported=no","source=git", "url=none"]
+
         var pair = vars[0].split("=");
         console.log(pair[1]);
         if (pair[0] == "imported")
