@@ -16,7 +16,6 @@ if [[ "$IS_IMPORTED" = "no" ]]; then
 fi
 
 # MAXINE: added the lines below to clone a git repo or zenodo zip file into the work directory
-experiment_dir=~/work/experiments
 
 if [[ "$IS_IMPORTED" = "yes" ]]; then
     cd work 
@@ -35,9 +34,10 @@ if [[ "$IS_IMPORTED" = "yes" ]]; then
     cd ..
 fi
 
-cd work/*/
+cd work
+cd $(ls -d */|head -n 1)
 if [[ -f "requirements.txt" ]]; then
-    python3 -m pip install -r "requirements.txt"
+   touch there_are_requirements
+   python3 -m pip install -r "requirements.txt"
 fi
-cd ../..
 
