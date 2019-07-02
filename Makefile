@@ -12,6 +12,11 @@ JUPYTERHUB_VERSION = $(shell git log -n1 --format=%h -- hub)
 REGISTRY := docker.chameleoncloud.org
 
 # Hub notebook targets
+.PHONY: c
+c: clean m
+
+.PHONY: m
+m: hub-build singleuser-build hub-start
 
 .PHONY: hub-build
 hub-build: hub/cull_idle_servers.py
@@ -70,6 +75,10 @@ singleuser-publish:
 
 # Local development helper targets
 
+#MAXINE: added a "volnet" option
+.PHONY: volnet
+volnet: network volumes
+
 .PHONY: network
 network:
 	@docker network inspect $(DOCKER_NETWORK_NAME) >/dev/null 2>&1 || docker network create $(DOCKER_NETWORK_NAME)
@@ -95,3 +104,9 @@ secrets/mysql.env: secrets
 
 .PHONY: check-files
 check-files: secrets/jupyterhub.env secrets/mysql.env
+
+#MAXINE: added a "clean" option
+.PHONY: clean
+clean: 
+	- docker stop $$(docker ps -aq)
+	docker system prune -f
