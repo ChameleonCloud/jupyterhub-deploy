@@ -28,8 +28,8 @@ if [[ "$IS_IMPORTED" = "yes" ]]; then
         wget https://zenodo.org/$SRC_PATH
         unzip '*.zip'
         rm *.zip       
-        tar xzf '*.tar.gz'
-        rm *.tar.gz
+    #    tar xzf '*.tar.gz'
+    #    rm *.tar.gz
     fi
     cd ..
 fi
