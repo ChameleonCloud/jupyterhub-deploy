@@ -3,6 +3,8 @@ include .env
 JUPYTERHUB_SINGLEUSER_WORKDIR ?= $(PWD)
 ifdef JUPYTERHUB_SINGLEUSER_EXTDIR
 JUPYTERHUB_SINGLEUSER_EXTRA := --mount "type=bind,src=$(JUPYTERHUB_SINGLEUSER_EXTDIR),target=/ext"
+else ifdef JUPYTERHUB_SINGLEUSER_EXTVOL
+JUPYTERHUB_SINGLEUSER_EXTRA := --mount "type=volume,src=$(JUPYTERHUB_SINGLEUSER_EXTVOL),target=/ext"
 endif
 
 JUPYTERHUB_SINGLEUSER_VERSION = $(shell git log -n1 --format=%h -- singleuser)
