@@ -1,6 +1,5 @@
 include .env
 
-JUPYTERHUB_SINGLEUSER_WORKDIR ?= $(PWD)
 ifdef JUPYTERHUB_SINGLEUSER_EXTDIR
 JUPYTERHUB_SINGLEUSER_EXTRA := --mount "type=bind,src=$(JUPYTERHUB_SINGLEUSER_EXTDIR),target=/ext"
 else ifdef JUPYTERHUB_SINGLEUSER_EXTVOL
@@ -47,7 +46,7 @@ singleuser-start:
 	docker run --rm --interactive --tty \
 		--publish 8888:8888 \
 		--user root \
-		--mount "type=bind,src=$(JUPYTERHUB_SINGLEUSER_WORKDIR),target=/work" \
+		--mount "type=volume,src=jupyter-work,target=/work" \
 		--workdir "/work" \
 		$(JUPYTERHUB_SINGLEUSER_EXTRA) \
 		$(JUPYTERHUB_SINGLEUSER_IMAGE):dev
@@ -57,7 +56,7 @@ singleuser-shell:
 	docker run --rm --interactive --tty \
 		--publish 8888:8888 \
 		--user root \
-		--mount "type=bind,src=$(JUPYTERHUB_SINGLEUSER_WORKDIR),target=/work" \
+		--mount "type=volume,src=jupyter-work,target=/work" \
 		--workdir "/work" \
 		$(JUPYTERHUB_SINGLEUSER_EXTRA) \
 		$(JUPYTERHUB_SINGLEUSER_IMAGE):dev \
