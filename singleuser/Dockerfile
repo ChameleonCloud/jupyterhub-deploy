@@ -1,4 +1,4 @@
-FROM jupyter/minimal-notebook:abdb27a6dfbb
+FROM jupyter/minimal-notebook:0c84b71d9f3d
 
 USER root
 
@@ -24,11 +24,10 @@ RUN curl -Lo /tmp/xoStitch.deb \
 # need to be updated.
 #
 
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.38
-RUN jupyter labextension install @jupyterlab/git@0.4.4
-RUN jupyter labextension install @jupyterlab/latex@0.6.1
-RUN jupyter labextension install @chameleoncloud/jupyterlab-theme-extension@0.0.5
-RUN jupyter labextension install @chameleoncloud/jupyterlab_swift@0.3.0
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@1.0
+RUN jupyter labextension install @jupyterlab/latex@1.0.0
+# RUN jupyter labextension install @chameleoncloud/jupyterlab-theme-extension@0.0.5
+# RUN jupyter labextension install @chameleoncloud/jupyterlab_swift@1.0.0
 
 #
 # Notebook dependencies
@@ -45,7 +44,6 @@ RUN python3 -m pip install --no-cache -r /tmp/singleuser-requirements.txt \
 
 RUN python3 -m bash_kernel.install
 RUN jupyter nbextension enable --py widgetsnbextension
-RUN jupyter serverextension enable --py jupyterlab_git
 
 #
 # Notebook start hooks
