@@ -49,7 +49,7 @@ singleuser-build:
 .PHONY: singleuser-start
 singleuser-start:
 	docker run --rm --interactive --tty \
-		--publish 8000:8000 \
+		--publish 8888:8888 \
 		--user root \
 		--mount "type=volume,src=jupyter-work,target=/work" \
 		--workdir "/work" \
@@ -59,7 +59,7 @@ singleuser-start:
 .PHONY: singleuser-shell
 singleuser-shell:
 	docker run --rm --interactive --tty \
-		--publish 8000:8000 \
+		--publish 8888:8888 \
 		--user root \
 		--mount "type=volume,src=jupyter-work,target=/work" \
 		--workdir "/work" \
