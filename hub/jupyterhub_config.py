@@ -4,73 +4,14 @@
 # Configuration file for JupyterHub
 import os
 import sys
-import urllib
 import hashlib
 
-from urllib.parse import parse_qsl,parse_qs,urlparse
+from urllib.parse import parse_qsl, unquote
 from dockerspawner import DockerSpawner
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.utils import url_path_join
 from tornado import web
 from tornado.httputil import url_concat
-
-def myPrint(label,item):
-    cmd = "echo '"+label+": "+item+"'"
-    os.system(cmd)
-
-# Spawner wrapper to create server options
-class DemoFormSpawner(DockerSpawner):
-    def _options_form_default(self):
-        default_src = "zenodo"
-        default_imp = "yes"
-        default_src_path = "google.com"
-        return """
-        <p> Loading your custom options... please wait... </p>
-        <div id ="hidden_form" style="display:none">
-        <label for="imported">Are you importing an experiment?</label>
-        <select id="imported" name="imported" size="1" onchange="console.log(window.location.href)">
-        <option value="no"> No </option>
-        <option value="yes"> Yes </option>
-        <option value="hello"> hello </option>
-        </select>
-        <label for="source">Select your desired source</label>
-        <select id="source" name="source" size="1">
-        <option value="git"> Git </option>
-        <option value="zenodo"> Zenodo </option>
-        </select>
-        <p>
-        <label for="src_path">Enter the source path</label>
-        <input id = "src_path" name="src_path" placeholder="eg:record/2647697/files/LaGuer/Jupyter-Notebook-Practice-Physical-Constants-Ratios-v0.0.102.zip"></input>
-        </p>
-        </div>
-        <script>
-        var query = window.location.search.substring(1);
-        console.log(query)
-        var vars = query.split("&");
-        if (vars.length != 3)
-            vars = ["imported=no","source=git", "src_path=none"]
-        console.log(vars);
-        var pair = vars[0].split("=");
-        if (pair[0] == "imported")
-            document.getElementById("imported").value = pair[1]
-        var pair = vars[1].split("=");
-        if (pair[0] == "source")
-            document.getElementById("source").value = pair[1]
-        var pair = vars[2].split("=");
-        if (pair[0] == "src_path")
-            document.getElementById("src_path").value = pair[1]
-
-        document.getElementById("spawn_form").submit()
-        </script>
-        """.format(imported=default_imp,source=default_src,src_path=default_src_path)
-
-    def options_from_form(self, formdata):
-        options = {}
-        options['imported'] = formdata['imported']
-        options['source'] = formdata['source']
-        options['src_path'] = formdata['src_path']
-        
-        return options
 
 c = get_config()
 
@@ -91,24 +32,9 @@ c.DockerSpawner.debug = False
 # Base spawner
 ##################
 
-
-from subprocess import check_call
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
-    imported = ''.join(spawner.user_options['imported'])
-    source = ''.join(spawner.user_options['source'])
-    src_path = urllib.parse.unquote(''.join(spawner.user_options['src_path']))
-    # Prints data 
-    cmd = "echo 'looking for imported, source, src_path in pre-spawn hook'"
-    os.system(cmd)
-    cmd = "echo '"+imported+"'"
-    os.system(cmd)
-    cmd = "echo '"+source+"'"
-    os.system(cmd)
-    cmd = "echo '"+src_path+"'"
-    os.system(cmd)
-    cmd = "echo '"+str(spawner)+"'"
-    os.system(cmd)
+    query = dict(parse_qsl(spawner.handler.request.query))
 
     username = spawner.user.name
     # Run as authenticated user
@@ -118,12 +44,10 @@ def pre_spawn_hook(spawner):
     spawner.environment['OS_KEYPAIR_PUBLIC_KEY'] = '/home/{}/.ssh/id_rsa.pub'.format(username)
     spawner.environment['OS_PROJECT_DOMAIN_NAME'] = 'default'
     spawner.environment['OS_REGION_NAME'] = 'CHI@UC'
-    # Indicates if cloning/downloading needs to occur
-    spawner.environment['IS_IMPORTED'] = imported
-    # Set source
-    spawner.environment['IMPORT_SRC'] = source
-    # Set link
-    spawner.environment['SRC_PATH'] = src_path
+
+    if 'source' in query:
+        spawner.environment['IMPORT_SRC'] = query.get('source')
+        spawner.environment['SRC_PATH'] = query.get('src_path')
 
 origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
@@ -140,7 +64,7 @@ c.Spawner.http_timeout = 600
 c.DockerSpawner.name_template = '{prefix}-{username}-{servername}'
 
 # Spawn single-user servers as Docker containers wrapped by the option form
-c.JupyterHub.spawner_class = DemoFormSpawner
+c.JupyterHub.spawner_class = DockerSpawner
 
 # Spawn containers from this image
 c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
@@ -159,9 +83,8 @@ c.DockerSpawner.notebook_dir = '~/work'
 
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container for that server
-c.DockerSpawner.volumes = { 'jupyterhub-user-{username}-{servername}': notebook_dir }
+c.DockerSpawner.volumes = { '{prefix}-{username}-{servername}': notebook_dir }
 
-   
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
 c.DockerSpawner.extra_create_kwargs.update({
@@ -208,7 +131,7 @@ c.JupyterHub.cookie_max_age_days = 7
 # Hub
 ##################
 
-# Allow named servers 
+# Allow named servers
 c.JupyterHub.allow_named_servers = True
 
 # User containers will access hub by container name on the Docker network
@@ -264,44 +187,42 @@ with open(os.path.join(pwd, 'adminlist')) as f:
 # Handlers
 ##################
 
+from tornado import web
+
 class UserRedirectExperimentHandler(BaseHandler):
     """Redirect spawn requests to user servers.
-    /import/exp_name?{query vars} will spawn a new experiment server
+    /import?{query vars} will spawn a new experiment server
     Server will be initialized with a git repo/zenodo zip file as specified
     If the user is not logged in, send to login URL, redirecting back here.
     Added by: Maxine
     """
 
     @web.authenticated
-    def get(self, path):
-
-        user = self.current_user
-        spawn_url = url_path_join("/hub/spawn/",user.name,path)
+    def get(self):
+        base_spawn_url = url_path_join(
+            self.hub.base_url, 'spawn', self.current_user.name)
 
         if self.request.query:
-            query_list = parse_qsl(self.request.query)
-            spawn_url = url_concat(spawn_url, query_list)
+            query = dict(parse_qsl(self.request.query))
+            source = query.get('source')
+            path = query.get('src_path')
 
-            # Generate and include server name
-            try:
-                src_path = query_list[2][1]
-                myPrint("src_path",src_path)
-                server_name = (
-                    hashlib.sha256(src_path.encode('utf-8'))
-                    .hexdigest()[:7]
-                )
-                spawn_url = spawn_url.replace("exp_name",server_name,1)
-            except IndexError:
-                # Empty if none provided
-                spawn_url = url_path_join("/user/",user.name) 
+            if not (source and path):
+                raise web.HTTPError(400, (
+                    'Missing required arguments: source, src_path'))
 
-        url = url_concat(
-            url_path_join(self.hub.base_url, "spawn", user.name), {"next": spawn_url}
-        )
-        self.redirect(url)
+            sha = hashlib.sha256()
+            sha.update(source.encode('utf-8'))
+            sha.update(path.encode('utf-8'))
+            server_name = sha.hexdigest()[:7]
+
+            spawn_url = url_path_join(base_spawn_url, server_name)
+            spawn_url += '?' + self.request.query
+        else:
+            spawn_url = base_spawn_url
+
+        self.redirect(spawn_url)
 
 c.JupyterHub.extra_handlers = [
-    (r'/import/(.*)?', UserRedirectExperimentHandler),
+    (r'/import', UserRedirectExperimentHandler),
 ]
-
-

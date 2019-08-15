@@ -6,4 +6,6 @@ if [[ ! -f "$key_file" ]]; then
   mkdir -p "$(dirname "$key_file")"
   ssh-keygen -f "$key_file" -t rsa -b 4096 -C "$NB_USER@jupyterhub" -N ""
   chmod 400 "$key_file"
+
+  # TODO: Also upload key?
 fi
