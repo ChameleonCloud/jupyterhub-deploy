@@ -56,9 +56,20 @@ make singleuser-start
 
 When the Notebook starts, a `token` value will be outputted as part of a url. Navigate to the local [Notebook server](http://localhost:8888) and input this token to log in.
 
-To change the Notebook working directory, provide a `JUPYTERHUB_SINGLEUSER_WORKDIR` environment variable. This can be useful if you are developing a JupyterLab extension, for example. This directory will be mounted at `/work` inside the Notebook container and will also be the "home" directory in the JupyterLab interface.
+To change the Notebook working directory, provide a `JUPYTERHUB_SINGLEUSER_WORKDIR` environment variable. This can be useful if you are testing a local Notebook or want to reference files on your host system in your Notebook directory. This directory will be mounted at `/work` inside the Notebook container and will also be the "home" directory in the JupyterLab interface.
 
 ```
 # Mounts the parent directory instead of current working directory
 JUPYTERHUB_SINGLEUSER_WORKDIR=$(realpath ..) make singleuser-start
 ```
+
+#### Mounting a local extension
+
+If you are doing local JupyterLab extension development, you likely want an easy way to test the extension. You can do that by specifying the `JUPYTERHUB_SINGLEUSER_EXTDIR` environment variable. This will be mounted at /ext inside the container. Additionally, the server will automatically detect that this mount exists and build/install your server and client extensions automatically.
+
+```
+# Mounts a special directory containing a local extension
+JUPYTERHUB_SINGLEUSER_EXTDIR=$(realpath ..) make singleuser-shell
+```
+
+**Note**: currently watch mode is not very well supported, though it should be possible especially when running via the 'shell' targets.
