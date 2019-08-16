@@ -90,7 +90,7 @@ c.DockerSpawner.notebook_dir = '~/work'
 
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container for that server
-c.DockerSpawner.volumes = { '{prefix}-{username}-{servername}': '/work' }
+c.DockerSpawner.volumes = { '{prefix}-{username}': '/work' }
 
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
