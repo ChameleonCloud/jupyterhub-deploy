@@ -6,7 +6,7 @@ import os
 import sys
 import hashlib
 
-from urllib.parse import parse_qsl, unquote
+from urllib.parse import parse_qsl, unquote, urlencode
 from dockerspawner import DockerSpawner
 from jupyterhub.handlers import BaseHandler
 from jupyterhub.utils import url_path_join
@@ -223,8 +223,13 @@ class UserRedirectExperimentHandler(BaseHandler):
             sha.update(path.encode('utf-8'))
             server_name = sha.hexdigest()[:7]
 
+            # Auto-open file when we land in server
+            if 'file_path' in query:
+                file_path = query.pop('file_path')
+                query['next'] = url_path_join(self.hub.base_url, 'user', self.current_user.name, server_name, 'lab/tree', file_path)
+
             spawn_url = url_path_join(base_spawn_url, server_name)
-            spawn_url += '?' + self.request.query
+            spawn_url += '?' + urlencode(query)
         else:
             spawn_url = base_spawn_url
 
