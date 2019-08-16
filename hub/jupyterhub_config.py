@@ -49,6 +49,13 @@ def pre_spawn_hook(spawner):
         spawner.environment['IMPORT_SRC'] = query.get('source')
         spawner.environment['SRC_PATH'] = query.get('src_path')
 
+        # Change volume/server names to include assigned server name
+        # (Allows multiple named servers/experiments per user)
+        spawner.name_template = '{prefix}-{username}-exp-{servername}'
+        spawner.volumes = {
+            '{prefix}-{username}-exp-{servername}': '/work'
+        }
+
 origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
 c.Spawner.pre_spawn_hook = pre_spawn_hook
@@ -61,7 +68,7 @@ c.Spawner.http_timeout = 600
 ##################
 
 # Set spawner names to work for multiple servers
-c.DockerSpawner.name_template = '{prefix}-{username}-{servername}'
+c.DockerSpawner.name_template = '{prefix}-{username}'
 
 # Spawn single-user servers as Docker containers wrapped by the option form
 c.JupyterHub.spawner_class = DockerSpawner
@@ -83,7 +90,7 @@ c.DockerSpawner.notebook_dir = '~/work'
 
 # Mount the real user's Docker volume on the host to the
 # notebook directory in the container for that server
-c.DockerSpawner.volumes = { '{prefix}-{username}-{servername}': notebook_dir }
+c.DockerSpawner.volumes = { '{prefix}-{username}-{servername}': '/work' }
 
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
