@@ -4,6 +4,14 @@
 # Configuration file for JupyterHub
 import os
 import sys
+import hashlib
+
+from urllib.parse import parse_qsl, unquote
+from dockerspawner import DockerSpawner
+from jupyterhub.handlers import BaseHandler
+from jupyterhub.utils import url_path_join
+from tornado import web
+from tornado.httputil import url_concat
 
 c = get_config()
 
@@ -24,9 +32,10 @@ c.DockerSpawner.debug = False
 # Base spawner
 ##################
 
-from subprocess import check_call
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
+    query = dict(parse_qsl(spawner.handler.request.query))
+
     username = spawner.user.name
     # Run as authenticated user
     spawner.environment['NB_USER'] = username
@@ -36,38 +45,53 @@ def pre_spawn_hook(spawner):
     spawner.environment['OS_PROJECT_DOMAIN_NAME'] = 'default'
     spawner.environment['OS_REGION_NAME'] = 'CHI@UC'
 
+    if 'source' in query:
+        spawner.environment['IMPORT_SRC'] = query.get('source')
+        spawner.environment['SRC_PATH'] = query.get('src_path')
+
 origin = '*'
 c.Spawner.args = ['--NotebookApp.allow_origin={0}'.format(origin)]
 c.Spawner.pre_spawn_hook = pre_spawn_hook
 c.Spawner.mem_limit = '2G'
+c.Spawner.http_timeout = 600
+
 
 ##################
 # Docker spawner
 ##################
 
-# Spawn single-user servers as Docker containers
-c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+# Set spawner names to work for multiple servers
+c.DockerSpawner.name_template = '{prefix}-{username}-{servername}'
+
+# Spawn single-user servers as Docker containers wrapped by the option form
+c.JupyterHub.spawner_class = DockerSpawner
 
 # Spawn containers from this image
 c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
+
 # Connect containers to this Docker network
 network_name = os.environ['DOCKER_NETWORK_NAME']
 c.DockerSpawner.use_internal_ip = True
 c.DockerSpawner.network_name = network_name
+
 # Pass the network name as argument to spawned containers
 c.DockerSpawner.extra_host_config = { 'network_mode': network_name }
 notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
+
 # This directory will be symlinked to the `notebook_dir` at runtime.
 c.DockerSpawner.notebook_dir = '~/work'
+
 # Mount the real user's Docker volume on the host to the
-# notebook directory in the container
-c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
+# notebook directory in the container for that server
+c.DockerSpawner.volumes = { '{prefix}-{username}-{servername}': notebook_dir }
+
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
 c.DockerSpawner.extra_create_kwargs.update({
     # Need to launch the container as root in order to grant sudo access
     'user': 'root'
 })
+
 c.DockerSpawner.environment = {
     'CHOWN_EXTRA': notebook_dir,
     'CHOWN_EXTRA_OPTS': '-R',
@@ -76,6 +100,7 @@ c.DockerSpawner.environment = {
     # Enable JupyterLab application
     'JUPYTER_ENABLE_LAB': 'yes',
 }
+
 c.DockerSpawner.cmd = [
     'start-notebook.sh',
     '--NotebookApp.shutdown_no_activity_timeout={}'.format(server_idle_timeout),
@@ -105,6 +130,9 @@ c.JupyterHub.cookie_max_age_days = 7
 ##################
 # Hub
 ##################
+
+# Allow named servers
+c.JupyterHub.allow_named_servers = True
 
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = 'jupyterhub'
@@ -153,3 +181,48 @@ with open(os.path.join(pwd, 'adminlist')) as f:
         if not line:
             continue
         admin.add(line.strip())
+
+
+##################
+# Handlers
+##################
+
+from tornado import web
+
+class UserRedirectExperimentHandler(BaseHandler):
+    """Redirect spawn requests to user servers.
+    /import?{query vars} will spawn a new experiment server
+    Server will be initialized with a git repo/zenodo zip file as specified
+    If the user is not logged in, send to login URL, redirecting back here.
+    Added by: Maxine
+    """
+
+    @web.authenticated
+    def get(self):
+        base_spawn_url = url_path_join(
+            self.hub.base_url, 'spawn', self.current_user.name)
+
+        if self.request.query:
+            query = dict(parse_qsl(self.request.query))
+            source = query.get('source')
+            path = query.get('src_path')
+
+            if not (source and path):
+                raise web.HTTPError(400, (
+                    'Missing required arguments: source, src_path'))
+
+            sha = hashlib.sha256()
+            sha.update(source.encode('utf-8'))
+            sha.update(path.encode('utf-8'))
+            server_name = sha.hexdigest()[:7]
+
+            spawn_url = url_path_join(base_spawn_url, server_name)
+            spawn_url += '?' + self.request.query
+        else:
+            spawn_url = base_spawn_url
+
+        self.redirect(spawn_url)
+
+c.JupyterHub.extra_handlers = [
+    (r'/import', UserRedirectExperimentHandler),
+]
