@@ -108,12 +108,23 @@ c.DockerSpawner.environment = {
     'JUPYTER_ENABLE_LAB': 'yes',
 }
 
-c.DockerSpawner.cmd = [
-    'start-notebook.sh',
-    '--NotebookApp.shutdown_no_activity_timeout={}'.format(server_idle_timeout),
-    '--MappingKernelManager.cull_idle_timeout={}'.format(kernel_idle_timeout),
-    '--MappingKernelManager.cull_interval={}'.format(kernel_idle_timeout // 8)
-]
+###################
+# Notebook args
+###################
+
+jupyterlab_args = {
+    'NotebookApp.shutdown_no_activity_timeout': server_idle_timeout,
+    'MappingKernelManager.cull_idle_timeout': kernel_idle_timeout,
+    'MappingKernelManager.cull_interval': kernel_idle_timeout // 8,
+    'ZenodoConfig.access_token': os.getenv('ZENODO_DEFAULT_ACCESS_TOKEN'),
+    # 'ZenodoConfig.upload_redirect_url': '',
+    'ZenodoConfig.community': 'Chameleon',
+    'ZenodoConfig.database_location': '/work/.zenodo',
+}
+
+c.DockerSpawner.cmd = (
+    ['start-notebook.sh'] + [f"--{k}={v}" for k, v in jupyterlab_args.items()]
+)
 
 ##################
 # Authentication

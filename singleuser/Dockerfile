@@ -28,6 +28,7 @@ RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@1.0
 RUN jupyter labextension install @jupyterlab/latex@1.0.0
 RUN jupyter labextension install @chameleoncloud/jupyterlab-theme-extension@1.0.0
 RUN jupyter labextension install @chameleoncloud/jupyterlab_swift@1.0.0
+RUN jupyter labextension install @chameleoncloud/jupyterlab_zenodo@1.0.0
 
 #
 # Notebook dependencies
