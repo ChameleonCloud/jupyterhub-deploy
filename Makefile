@@ -33,6 +33,12 @@ hub-publish:
 		         $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
 	docker push $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
 
+.PHONY: hub-publish-latest
+hub-publish-latest:
+	docker tag $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) \
+				$(REGISTRY)/$(JUPYTERHUB_IMAGE):latest
+	docker push $(REGISTRY)/$(JUPYTERHUB_IMAGE):latest
+
 # Single user notebook targets
 
 .PHONY: singleuser-build
@@ -67,6 +73,12 @@ singleuser-publish:
 	docker tag $(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION) \
 		         $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION)
 	docker push $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION)
+
+.PHONY: singleuser-publish-latest
+singleuser-publish-latest:
+	docker tag $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION) \
+				$(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):latest
+	docker push $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):latest
 
 # Local development helper targets
 
