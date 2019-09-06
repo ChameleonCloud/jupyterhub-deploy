@@ -1,5 +1,13 @@
 workdir=/work
 
+git_fetch_latest() {
+  local repo="$1"
+  # Gracefully fail
+  (cd "$repo" && git stash && git pull && git stash pop) || {
+    echo "Failed to pull latest changes from remote"
+  }
+}
+
 setup_default_server() {
   # Copy examples and other "first launch" files over.
   rsync -aq /etc/jupyter/serverroot/ $workdir/
@@ -8,7 +16,7 @@ setup_default_server() {
   if [[ ! -d "$notebooks_dir" ]]; then
     git clone https://github.com/chameleoncloud/notebooks.git "$notebooks_dir"
   else
-    (cd "$notebooks_dir" && git stash && git pull && git stash pop || true)
+    git_fetch_latest "$notebooks_dir"
   fi
 }
 
@@ -20,7 +28,11 @@ setup_experiment_server() {
 
   case "$IMPORT_SRC" in
     git)
-      git clone https://github.com/$SRC_PATH $workdir
+      if [[ ! -d "$workdir/.git" ]]; then
+        git clone https://github.com/$SRC_PATH $workdir
+      else
+        git_fetch_latest $workdir
+      fi
       ;;
     zenodo)
       wget https://zenodo.org/$SRC_PATH
