@@ -1,5 +1,9 @@
 workdir=/work
 
+# Set up Git author config
+git config --global user.name "$NB_USER"
+git config --global user.email "$NB_USER@jupyter.chameleoncloud.org"
+
 git_fetch_latest() {
   local repo="$1"
   # Gracefully fail
