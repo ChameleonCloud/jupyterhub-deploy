@@ -8,7 +8,7 @@ USER root
 
 RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
-         curl dnsutils jq openjdk-8-jre vim zip \
+         curl dnsutils jq moreutils openjdk-8-jre vim zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -28,7 +28,7 @@ RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager@1.0
 RUN jupyter labextension install @jupyterlab/latex@1.0.0
 RUN jupyter labextension install @chameleoncloud/jupyterlab-theme-extension@1.0.0
 RUN jupyter labextension install @chameleoncloud/jupyterlab_swift@1.0.0
-RUN jupyter labextension install @chameleoncloud/jupyterlab_zenodo@0.1.1
+RUN jupyter labextension install @chameleoncloud/jupyterlab_zenodo@0.1.4
 
 #
 # Notebook dependencies
@@ -62,5 +62,10 @@ RUN mkdir -p /etc/jupyter/serverroot
 COPY serverroot/* /etc/jupyter/serverroot/
 
 COPY bashrc.d /home/$NB_USER/.bashrc.d
+
+COPY jupyter_notebook_config.py.append /tmp/
+RUN cat /etc/jupyter/jupyter_notebook_config.py \
+        /tmp/jupyter_notebook_config.py.append \
+    | sponge /etc/jupyter/jupyter_notebook_config.py
 
 USER $NB_USER

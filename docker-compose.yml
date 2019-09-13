@@ -17,7 +17,7 @@ services:
     image: ${JUPYTERHUB_IMAGE}:dev
     container_name: jupyterhub
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       # Bind Docker socket on the host so we can connect to the daemon from
       # within the container

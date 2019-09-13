@@ -1,4 +1,5 @@
-# Copyright (c) Jupyter Development Team.
+# Original copyright (c) Jupyter Development Team.
+# Modified copyright (c) University of Chicago.
 # Distributed under the terms of the Modified BSD License.
 
 # Configuration file for JupyterHub
@@ -19,14 +20,18 @@ server_idle_timeout = 60 * 60 * 24
 server_max_age = 60 * 60 * 24 * 7
 kernel_idle_timeout = 60 * 60 * 2
 
+debug = os.getenv('DEBUG', '').strip().lower() in ['1', 'true', 'yes']
+
 ##################
 # Logging
 ##################
 
-c.Application.log_level = 'INFO'
-c.JupyterHub.log_level = 'INFO'
-c.Spawner.debug = False
-c.DockerSpawner.debug = False
+log_level = 'DEBUG' if debug else 'INFO'
+
+c.Application.log_level = log_level
+c.JupyterHub.log_level = log_level
+c.Spawner.debug = debug
+c.DockerSpawner.debug = debug
 
 ##################
 # Base spawner
@@ -117,9 +122,8 @@ jupyterlab_args = {
     'MappingKernelManager.cull_idle_timeout': kernel_idle_timeout,
     'MappingKernelManager.cull_interval': kernel_idle_timeout // 8,
     'ZenodoConfig.access_token': os.getenv('ZENODO_DEFAULT_ACCESS_TOKEN'),
-    # 'ZenodoConfig.upload_redirect_url': '',
-    'ZenodoConfig.community': 'Chameleon',
-    'ZenodoConfig.database_location': '/work/.zenodo',
+    'ZenodoConfig.upload_redirect_url': os.getenv('CHAMELEON_SHARING_PORTAL_UPLOAD_URL'),
+    'ZenodoConfig.dev': debug,
 }
 
 c.DockerSpawner.cmd = (
