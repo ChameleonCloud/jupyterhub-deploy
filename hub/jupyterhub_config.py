@@ -122,7 +122,7 @@ jupyterlab_args = {
     'MappingKernelManager.cull_idle_timeout': kernel_idle_timeout,
     'MappingKernelManager.cull_interval': kernel_idle_timeout // 8,
     'ZenodoConfig.access_token': os.getenv('ZENODO_DEFAULT_ACCESS_TOKEN'),
-    'ZenodoConfig.upload_redirect_url': os.getenv('CHAMELEON_SHARING_PORTAL_UPLOAD_URL'),
+    'ZenodoConfig.upload_redirect_url': os.getenv('CHAMELEON_SHARING_PORTAL_UPLOAD_URL', ''),
     'ZenodoConfig.dev': debug,
 }
 

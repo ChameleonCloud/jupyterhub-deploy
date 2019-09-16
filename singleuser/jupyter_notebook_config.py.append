@@ -5,6 +5,6 @@
 
 import os
 c.ZenodoConfig.access_token = os.getenv('ZENODO_DEFAULT_ACCESS_TOKEN')
-c.ZenodoConfig.upload_redirect_url = os.getenv('CHAMELEON_SHARING_PORTAL_UPLOAD_URL')
+c.ZenodoConfig.upload_redirect_url = os.getenv('CHAMELEON_SHARING_PORTAL_UPLOAD_URL', '')
 c.ZenodoConfig.community = 'chameleon'
 c.ZenodoConfig.database_location = '/work/.zenodo'

@@ -24,6 +24,10 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
       - "data:${DATA_VOLUME_CONTAINER}"
     environment:
+      # Pass debug flag through
+      DEBUG: ${DEBUG}
+      # Point to dev Portal build by default
+      CHAMELEON_SHARING_PORTAL_UPLOAD_URL: ${CHAMELEON_SHARING_PORTAL_UPLOAD_URL}
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
       # The container directory that will hold the user's working files
