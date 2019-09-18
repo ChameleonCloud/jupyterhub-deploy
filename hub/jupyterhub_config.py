@@ -86,8 +86,17 @@ network_name = os.environ['DOCKER_NETWORK_NAME']
 c.DockerSpawner.use_internal_ip = True
 c.DockerSpawner.network_name = network_name
 
-# Pass the network name as argument to spawned containers
-c.DockerSpawner.extra_host_config = { 'network_mode': network_name }
+# Configure docker host vars
+# This is where container resource limits are set. Note the
+# cpu_period and cpu_quota settings: the quota divided by the
+# period is effectively how many cores a container will be allowed
+# to have in a CPU-bound scheduling situation, e.g. 100/100 = 1 core.
+c.DockerSpawner.extra_host_config = {
+    'network_mode': network_name,
+    'mem_limit': '1G',
+    'cpu_period': 100, # ms
+    'cpu_quota': 100, # ms
+}
 notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
 
 # This directory will be symlinked to the `notebook_dir` at runtime.
