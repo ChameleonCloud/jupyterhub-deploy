@@ -94,8 +94,8 @@ c.DockerSpawner.network_name = network_name
 c.DockerSpawner.extra_host_config = {
     'network_mode': network_name,
     'mem_limit': '1G',
-    'cpu_period': 100, # ms
-    'cpu_quota': 100, # ms
+    'cpu_period': 100000, # nanosecs
+    'cpu_quota': 100000, # nanosecs
 }
 notebook_dir = os.environ['DOCKER_NOTEBOOK_DIR']
 
