@@ -13,8 +13,9 @@ if [[ -d /ext ]]; then
   # Install client code, if any
   if [[ -d src ]]; then
     npm run build
+    # Link local extension
     jupyter labextension list 2>/dev/null | grep /ext || {
-      jupyter labextension install .
+      jupyter labextension link --app-dir=/home/jovyan/.jupyter/lab .
     }
   fi
 
