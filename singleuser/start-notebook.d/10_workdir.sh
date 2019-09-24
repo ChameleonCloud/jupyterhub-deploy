@@ -12,16 +12,32 @@ git_fetch_latest() {
   }
 }
 
+git_fetch() {
+  local remote="$1"
+  local checkout="$2"
+
+  if [[ ! -d "$checkout/.git" ]]; then
+    git clone "$remote" $checkout
+  else
+    git_fetch_latest $checkout
+  fi
+}
+
+zenodo_fetch() {
+  local api_base="$1"
+  local doi="$2"
+  local dest="$3"
+
+  local record_id=$(sed 's/^[0-9\.]*\/zenodo\.//' <<<"$doi")
+  curl "$api_base/api/records/$record_id" \
+    | jq -r .files[].links.self \
+    | xargs -L1 wget -P $dest
+}
+
 setup_default_server() {
   # Copy examples and other "first launch" files over.
   rsync -aq /etc/jupyter/serverroot/ $workdir/
-
-  notebooks_dir=$workdir/notebooks
-  if [[ ! -d "$notebooks_dir" ]]; then
-    git clone https://github.com/chameleoncloud/notebooks.git "$notebooks_dir"
-  else
-    git_fetch_latest "$notebooks_dir"
-  fi
+  git_fetch https://github.com/chameleoncloud/notebooks.git $workdir/notebooks
 }
 
 setup_experiment_server() {
@@ -32,19 +48,23 @@ setup_experiment_server() {
 
   case "$IMPORT_SRC" in
     git)
-      if [[ ! -d "$workdir/.git" ]]; then
-        git clone https://github.com/$SRC_PATH $workdir
+      # Allow any remote repository
+      git_fetch $SRC_PATH $workdir
+      ;;
+    github)
+      # Convenience; just specify repo name
+      git_fetch https://github.com/$SRC_PATH $workdir
+      ;;
+    zenodo|zenodo_sandbox)
+      if [[ "$IMPORT_SRC" == *sandbox ]]; then
+        zenodo_fetch https://sandbox.zenodo.org "$SRC_PATH" $workdir
       else
-        git_fetch_latest $workdir
+        zenodo_fetch https://zenodo.org "$SRC_PATH" $workdir
       fi
       ;;
-    zenodo)
-      wget https://zenodo.org/$SRC_PATH
-      unzip '*.zip' -d $workdir
-      rm *.zip
-      ;;
     *)
-      echo "Unknown import source '$IMPORT_SRC'. Supported values are 'git', 'zenodo'"
+      echo "Unknown import source '$IMPORT_SRC'."
+      echo "Supported values are 'git', 'github', 'zenodo', 'zenodo_sandbox'"
       exit 1
       ;;
   esac
@@ -53,6 +73,8 @@ setup_experiment_server() {
   if [[ -f "requirements.txt" ]]; then
      pip install -r "requirements.txt"
   fi
+  unzip *.zip && rm *.zip || echo "No archives to unzip"
+  # TODO: automatic tarball extraction
   popd
 }
 
