@@ -28,7 +28,7 @@ python-novaclient~=11.0
 python-openstackclient~=3.0
 python-swiftclient~=3.6.0
 # Forked clients
-git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/rocky#egg=python-blazarclient
+git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/stein#egg=python-blazarclient
 git+https://github.com/ChameleonCloud/python-heatclient@stable/rocky#egg=python-heatclient
 
 # ChameleonCloud-provided
