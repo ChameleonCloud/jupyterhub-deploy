@@ -9,6 +9,7 @@ tqdm~=4.0
 bash_kernel~=0.7
 
 # Commonly-used libraries
+ansible~=2.0
 matplotlib~=3.0
 numpy~=1.15
 pandas~=0.25.0
