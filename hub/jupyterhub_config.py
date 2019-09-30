@@ -64,7 +64,7 @@ def pre_spawn_hook(spawner):
         spawner.name_template = '{prefix}-{username}-exp-{servername}'
         spawner.volumes = {
             '{prefix}-{username}-exp-{servername}': {
-                'mount': '/work',
+                'target': '/work',
                 'driver': os.getenv('DOCKER_VOLUME_DRIVER', 'local'),
                 'driver_opts': docker_volume_opts(),
             }
