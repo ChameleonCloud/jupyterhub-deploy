@@ -37,6 +37,11 @@ c.DockerSpawner.debug = debug
 # Base spawner
 ##################
 
+def docker_volume_opts():
+    opt_str = os.getenv('DOCKER_VOLUME_DRIVER_OPTS', '')
+    tuples = [s.split('=') for s in opt_str.split(',')]
+    return {t[0]: t[1] for t in tuples}
+
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
     query = dict(parse_qsl(spawner.handler.request.query))
@@ -58,7 +63,11 @@ def pre_spawn_hook(spawner):
         # (Allows multiple named servers/experiments per user)
         spawner.name_template = '{prefix}-{username}-exp-{servername}'
         spawner.volumes = {
-            '{prefix}-{username}-exp-{servername}': '/work'
+            '{prefix}-{username}-exp-{servername}': {
+                'mount': '/work',
+                'driver': os.getenv('DOCKER_VOLUME_DRIVER', 'local'),
+                'driver_opts': docker_volume_opts(),
+            }
         }
 
 origin = '*'

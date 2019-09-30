@@ -4,7 +4,7 @@ RUN conda install -c bioconda mysqlclient \
     && conda clean -tipsy \
     && pip install --no-cache-dir \
       jupyterhub-keystoneauthenticator~=0.1.4 \
-      dockerspawner~=0.11.0
+      git+https://github.com/chameleoncloud/dockerspawner.git@volume-drivers#egg=dockerspawner
 
 COPY cull_idle_servers.py /srv/jupyterhub/cull_idle_servers.py
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
