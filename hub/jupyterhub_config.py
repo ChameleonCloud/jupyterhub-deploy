@@ -39,8 +39,8 @@ c.DockerSpawner.debug = debug
 
 def docker_volume_opts():
     opt_str = os.getenv('DOCKER_VOLUME_DRIVER_OPTS', '')
-    tuples = [s.split('=') for s in opt_str.split(',')]
-    return {t[0]: t[1] for t in tuples}
+    tuples = [s.split('=') for s in opt_str.split(',') if s]
+    return {t[0]: t[1] for t in tuples if len(t) == 2}
 
 # This is where we can do other specific bootstrapping for the user environment
 def pre_spawn_hook(spawner):
