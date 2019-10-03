@@ -13,7 +13,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -Lo /tmp/xoStitch.deb \
-      https://github.com/ChameleonCloud/xo-stitch/releases/download/v0.1-alpha/xoStitch.deb \
+      https://github.com/ChameleonCloud/xo-stitch/releases/download/v0.2/xoStitch-v0.2.deb \
     && dpkg -i /tmp/xoStitch.deb \
     && rm -f /tmp/xoStitch.deb
 
