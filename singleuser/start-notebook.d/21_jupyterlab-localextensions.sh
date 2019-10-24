@@ -7,15 +7,17 @@ if [[ -d /ext ]]; then
     python setup.py install
     # Hacky way to get the module name
     module_dir=$(find . -maxdepth 2 -name __init__.py | xargs dirname)
-    jupyter serverextension enable --py ${module_dir##./}
+    jupyter serverextension enable --py ${module_dir##./} || {
+      echo "Failed installing $module_dir as server extension!"
+    }
   fi
 
   # Install client code, if any
   if [[ -d src ]]; then
     npm run build
-    # Link local extension
+    # Install local extension
     jupyter labextension list 2>/dev/null | grep /ext || {
-      jupyter labextension link --app-dir=/home/jovyan/.jupyter/lab .
+      jupyter labextension install --app-dir=/home/jovyan/.jupyter/lab .
     }
   fi
 
