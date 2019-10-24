@@ -94,6 +94,7 @@ wait_ssh() {
   local ip="$1"
   local timeout="${2:-300}"
   echo "Waiting up to $timeout seconds for SSH on $ip..."
+  mkdir -p ~/.ssh
   timeout $timeout bash -c 'until printf "" 2>>/dev/null >>/dev/tcp/$0/$1; do sleep 1; done' "$ip" 22 \
       && ssh-keyscan -H "$ip" 2>/dev/null >> ~/.ssh/known_hosts \
       && echo "SSH is running!"
