@@ -15,6 +15,8 @@ mkdir -p "$(dirname $zenodo_plugin_settings)"
 cat >"$zenodo_plugin_settings" <<EOF
 {
   // Obscure reference to Zenodo
-  "uploadTitle": "Publish to Chameleon"
+  "createLabel": "Publish to Chameleon",
+  "editLabel": "Edit on Chameleon",
+  "externalEditUrl": "https://www.chameleoncloud.org/share/edit?doi={doi}"
 }
 EOF
