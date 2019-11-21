@@ -2,7 +2,7 @@
 ipywidgets~=7.5
 jupyterlab_latex~=1.0
 jupyterlab_swift~=0.2.1
-jupyterlab_zenodo~=0.1.5
+jupyterlab_zenodo~=0.2.0
 tqdm~=4.0
 
 # IPython kernels

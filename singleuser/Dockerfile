@@ -1,4 +1,4 @@
-FROM jupyter/minimal-notebook:1386e2046833
+FROM jupyter/minimal-notebook:ad3574d3c5c7
 
 USER root
 
@@ -24,12 +24,11 @@ RUN curl -Lo /tmp/xoStitch.deb \
 # need to be updated.
 #
 
-# TODO: re-enable when jupyter-widgets supports JLab 1.1
-# RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager@1.0
+RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager@1.1
 RUN jupyter labextension install --no-build @jupyterlab/latex@1.0.0
 RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-theme-extension@1.0.0
 RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_swift@1.0.0
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_zenodo@0.2.0
+RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_zenodo@0.3.0
 RUN jupyter lab build
 
 #
