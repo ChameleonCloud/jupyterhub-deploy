@@ -28,6 +28,7 @@ services:
       DEBUG: ${DEBUG}
       # Point to dev Portal build by default
       CHAMELEON_SHARING_PORTAL_UPLOAD_URL: ${CHAMELEON_SHARING_PORTAL_UPLOAD_URL}
+      CHAMELEON_SHARING_PORTAL_UPDATE_URL: ${CHAMELEON_SHARING_PORTAL_UPDATE_URL}
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
       # The container directory that will hold the user's working files
