@@ -1,3 +1,5 @@
+set -x
+
 workdir=/work
 
 # Remove artifacts from mounting remote volume
@@ -32,7 +34,7 @@ zenodo_fetch() {
   local dest="$3"
 
   local record_id=$(sed 's/^[0-9\.]*\/zenodo\.//' <<<"$doi")
-  curl "$api_base/api/records/$record_id" \
+  curl -L "$api_base/api/records/$record_id" \
     | jq -r .files[].links.self \
     | xargs -L1 wget -P $dest
 }
@@ -90,3 +92,5 @@ fi
 # Our volume mount is at the root directory, link it in to the user's
 # home directory for convenience.
 rm -rf /home/jovyan/work && ln -s $workdir /home/jovyan/work
+
+set +x
