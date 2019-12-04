@@ -50,8 +50,8 @@ def pre_spawn_hook(spawner):
     # Run as authenticated user
     spawner.environment['NB_USER'] = username
     spawner.environment['OS_INTERFACE'] = 'public'
-    spawner.environment['OS_KEYPAIR_PRIVATE_KEY'] = '/home/{}/.ssh/id_rsa'.format(username)
-    spawner.environment['OS_KEYPAIR_PUBLIC_KEY'] = '/home/{}/.ssh/id_rsa.pub'.format(username)
+    spawner.environment['OS_KEYPAIR_PRIVATE_KEY'] = '/work/.ssh/id_rsa'
+    spawner.environment['OS_KEYPAIR_PUBLIC_KEY'] = '/work/.ssh/id_rsa.pub'
     spawner.environment['OS_PROJECT_DOMAIN_NAME'] = 'default'
     spawner.environment['OS_REGION_NAME'] = 'CHI@UC'
 
