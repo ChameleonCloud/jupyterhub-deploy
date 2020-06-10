@@ -11,10 +11,6 @@ There are two images defined, each in its own directory:
 
 To build and release a new version of either the JupyterHub server or the single-user Notebook image, use the `*-build` and `*-publish` targets. New releases are always tagged with the Git SHA of the latest commit that touched the directory containing the build definitions.
 
-**Note**: when releasing new versions, particularly when dependences are updated, it is particularly important to ensure compatibility between the version of JupyterHub built and the version of JupyterLab used in the single-user image. Ensure the base image for the singleuser image (we use the [minimal-notebook](https://github.com/jupyter/docker-stacks/tree/master/minimal-notebook) Docker stack provided by Jupyter) has a matching JupyterHub version.
-
-**Note**: if you are building these images on a local (development) machine running Mac OS X, you will probably have to increase the amount of RAM available to Docker or risk your builds being mysteriously killed due to hitting memory limits. This can be configured in the Preferences for Docker for Mac; a value of 4G should be high enough.
-
 ```
 # Publish the JupyterHub image to the Docker registry
 make hub-build
@@ -24,6 +20,17 @@ make hub-publish
 make singleuser-build
 make singleuser-publish
 ```
+
+**Note**: if you are building these images on a local (development) machine running Mac OS X, you will probably have to increase the amount of RAM available to Docker or risk your builds being mysteriously killed due to hitting memory limits. This can be configured in the Preferences for Docker for Mac; a value of 4G should be high enough.
+
+### Upgrading the Hub image
+
+When upgrading the Hub image, a few things should be done:
+
+1. Check the [JupyterHub changelog](https://jupyterhub.readthedocs.io/en/stable/changelog.html) to see if there are any breaking changes or important things to note.
+2. Check if there are updates to the [`cull_idle_servers.py`](https://github.com/jupyterhub/jupyterhub/blob/master/examples/cull-idle/cull_idle_servers.py) service, which is copied directly from the JupyterHub repo.
+
+**Note**: when releasing new versions, particularly when dependences are updated, it is particularly important to ensure compatibility between the version of JupyterHub built and the version of JupyterLab used in the single-user image. Ensure the base image for the singleuser image (we use the [minimal-notebook](https://github.com/jupyter/docker-stacks/tree/master/minimal-notebook) Docker stack provided by Jupyter) has a matching JupyterHub version.
 
 ## Development
 
@@ -75,7 +82,7 @@ JUPYTERHUB_SINGLEUSER_EXTDIR=$(realpath ..) make singleuser-shell
 ```
 
 > **Note**: If you are testing a local extension which has a released copy already installed to the singleuser image, you should uninstall the installed version first:
-> 
+>
 > `jupyter serverextension disable <module> && pip uninstall <module>`
 >
 > Otherwise, you may run in to odd behavior where the updated module is not properly linked in to the Jupyter server.
