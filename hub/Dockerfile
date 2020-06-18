@@ -1,5 +1,10 @@
-ARG base_image=jupyterhub/jupyterhub:1.1
+ARG base_image=jupyterhub/jupyterhub:1.2
 FROM $base_image as base
+
+RUN apt-get update \
+    && apt-get install -yq --no-install-recommends \
+        libmariadbclient-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 FROM base as builder
 
@@ -10,14 +15,14 @@ RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
          build-essential \
          git-core \
-         libmariadbclient-dev \
          python3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip wheel --wheel-dir wheelhouse \
       mysqlclient \
-      jupyterhub-keystoneauthenticator~=0.1.4 \
+      jupyterhub-chameleon~=0.0.2 \
+      jupyterhub-keystoneauthenticator~=0.2.2 \
       git+https://github.com/chameleoncloud/dockerspawner.git@volume-drivers#egg=dockerspawner
 
 FROM base
@@ -30,6 +35,9 @@ FROM base
 # causes errors on install. Use a different directory (wheelhouse-custom here).
 COPY --from=builder /src/jupyterhub/wheelhouse /tmp/wheelhouse-custom
 RUN python3 -m pip install --no-cache /tmp/wheelhouse-custom/*
+
+COPY entrypoint.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 COPY cull_idle_servers.py /srv/jupyterhub/cull_idle_servers.py
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py

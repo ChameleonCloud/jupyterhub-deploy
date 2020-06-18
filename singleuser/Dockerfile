@@ -34,7 +34,7 @@ RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager@
 # is resolved.
 # RUN jupyter labextension install --no-build @jupyterlab/latex@2.0.0
 RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-theme-extension@2.0.0
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_swift@2.0.0
+RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_swift@2.0.2
 RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_zenodo@2.0.0
 RUN jupyter lab build
 
