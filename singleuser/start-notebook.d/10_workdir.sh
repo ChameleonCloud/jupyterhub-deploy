@@ -1,6 +1,7 @@
 set -x
 
 workdir=/work
+expdir=/exp
 
 # Remove artifacts from mounting remote volume
 rm -rf "$workdir/lost+found"
@@ -81,6 +82,9 @@ setup_experiment_server() {
   unzip *.zip && rm *.zip || echo "No archives to unzip"
   # TODO: automatic tarball extraction
   popd
+
+  # TODO: use separate experiment directory for named servers?
+  # rm -rf /home/jovyan/exp && ln -s $expdir /home/jovyan/exp
 }
 
 if [[ -z "${IMPORT_SRC+x}" ]]; then

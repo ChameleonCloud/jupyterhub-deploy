@@ -1,4 +1,8 @@
-FROM jupyter/minimal-notebook:ad3574d3c5c7
+# Python 3.7.6
+# Notebook 6.0.3
+# JupyterLab 2.1.3
+# JupyterHub 1.1.0
+FROM jupyter/minimal-notebook:76402a27fd13
 
 USER root
 
@@ -19,16 +23,19 @@ RUN curl -Lo /tmp/xoStitch.deb \
 
 #
 # JupyterLab extensions
-# Note: JupyterLab is quite unstable at the moment (not 1.x yet) and as such
+#
+# NOTE(jason): JupyterLab is in an active development state, so
 # whenever a new minor version of JupyterLab is released, often the extensions
 # need to be updated.
 #
 
-RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager@1.1
-RUN jupyter labextension install --no-build @jupyterlab/latex@1.0.0
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-theme-extension@1.0.0
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_swift@1.0.0
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_zenodo@0.3.0
+RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager@2.0
+# NOTE(jason): can re-enable when https://github.com/jupyterlab/jupyterlab-latex/issues/135
+# is resolved.
+# RUN jupyter labextension install --no-build @jupyterlab/latex@2.0.0
+RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-theme-extension@2.0.0
+RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_swift@2.0.2
+RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_zenodo@2.0.0
 RUN jupyter lab build
 
 #
@@ -37,7 +44,10 @@ RUN jupyter lab build
 #
 
 COPY requirements.txt /tmp/singleuser-requirements.txt
-RUN python3 -m pip install --no-cache -r /tmp/singleuser-requirements.txt \
+
+ARG openstack_release=train
+RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstack/requirements/stable/${openstack_release}/upper-constraints.txt" \
+  && python3 -m pip install --no-cache -r /tmp/singleuser-requirements.txt \
   && rm -f /tmp/singleuser-requirements.txt
 
 #
@@ -63,6 +73,7 @@ RUN mkdir -p /etc/jupyter/serverroot
 COPY serverroot/* /etc/jupyter/serverroot/
 
 COPY bashrc.d /home/$NB_USER/.bashrc.d
+COPY start-notebook-dev.sh /usr/local/bin/
 
 COPY jupyter_notebook_config.py.append /tmp/
 RUN cat /etc/jupyter/jupyter_notebook_config.py \

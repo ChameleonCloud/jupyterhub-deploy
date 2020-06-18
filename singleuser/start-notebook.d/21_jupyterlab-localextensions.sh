@@ -2,22 +2,25 @@
 if [[ -d /ext ]]; then
   pushd /ext 2>/dev/null
 
-  # Install server code, if any
+  app_dir="/home/jovyan/.jupyter/lab"
+  err_log=jupyter-extension-error.log
+
+  # Install Python extension code
   if [[ -f setup.py ]]; then
-    python setup.py install
+    pip list | grep -q /ext || pip install -e .
     # Hacky way to get the module name
     module_dir=$(find . -maxdepth 2 -name __init__.py | xargs dirname)
-    jupyter serverextension enable --py ${module_dir##./} || {
-      echo "Failed installing $module_dir as server extension!"
-    }
+    for exttype in nbextension serverextension; do
+      jupyter "$exttype" enable --py ${module_dir##./} 2>>$err_log && break
+      echo "Failed installing $module_dir as $exttype. See $err_log for details."
+    done
   fi
 
-  # Install client code, if any
-  if [[ -d src ]]; then
-    npm run build
-    # Install local extension
-    jupyter labextension list 2>/dev/null | grep /ext || {
-      jupyter labextension install --app-dir=/home/jovyan/.jupyter/lab .
+  # Install JS extension code
+  if [[ -f package.json ]]; then
+    jupyter labextension list --app-dir="$app_dir" 2>/dev/null | grep -q /ext || {
+      npm run build
+      jupyter labextension link --app-dir="$app_dir" .
     }
   fi
 

@@ -55,7 +55,8 @@ singleuser-start:
 		--mount "type=volume,src=jupyter-work,target=/work" \
 		--workdir "/work" \
 		$(JUPYTERHUB_SINGLEUSER_EXTRA) \
-		$(JUPYTERHUB_SINGLEUSER_IMAGE):dev
+		$(JUPYTERHUB_SINGLEUSER_IMAGE):dev \
+		start-notebook-dev.sh
 
 .PHONY: singleuser-shell
 singleuser-shell:
