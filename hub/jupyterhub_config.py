@@ -2,6 +2,30 @@
 # Distributed under the terms of the Modified BSD License.
 
 # Configuration file for JupyterHub
+# The following environment variables affect the configuration at runtime:
+#
+# DEBUG:
+# JUPYTERHUB_BASE_URL:
+# DATA_VOLUME_CONTAINER:
+# DOCKER_VOLUME_DRIVER:
+# DOCKER_VOLUME_DRIVER_OPTS:
+# DOCKER_NOTEBOOK_IMAGE:
+# DOCKER_NETWORK_NAME:
+# KEYCLOAK_SERVER_URL:
+# KEYCLOAK_REALM_NAME:
+# KEYCLOAK_CLIENT_ID:
+# KEYCLOAK_CLIENT_SECRET:
+# OS_AUTH_URL:
+# OS_REGION_NAME:
+# OS_IDENTITY_PROVIDER:
+# OS_PROTOCOL:
+# MYSQL_HOST:
+# MYSQL_USER:
+# MYSQL_PASSWORD:
+# MYSQL_DATABASE:
+# CHAMELEON_SHARING_PORTAL_UPLOAD_URL:
+# CHAMELEON_SHARING_PORTAL_UPDATE_URL:
+#
 import os
 import sys
 
@@ -44,6 +68,7 @@ c.ChameleonSpawner.args.extend([
 c.JupyterHub.hub_ip = 'jupyterhub'
 c.JupyterHub.hub_port = 8080
 c.JupyterHub.bind_url = 'http://:8000'
+c.JupyterHub.base_url = os.environ.get('JUPYTERHUB_BASE_URL', '/')
 
 # Persist hub data on volume mounted inside container
 data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')

@@ -21,7 +21,7 @@ RUN apt-get update \
 
 RUN python3 -m pip wheel --wheel-dir wheelhouse \
       mysqlclient \
-      jupyterhub-keystoneauthenticator~=0.2.2 \
+      jupyterhub-keystoneauthenticator~=0.2.5 \
       git+https://github.com/chameleoncloud/dockerspawner.git@volume-drivers#egg=dockerspawner
 
 FROM base
@@ -40,7 +40,7 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
 
-RUN python3 -m pip install jupyterhub-chameleon~=0.0.3
+RUN python3 -m pip install jupyterhub-chameleon~=0.0.4
 
 COPY adminlist /srv/jupyterhub/adminlist
 

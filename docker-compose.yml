@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 
 services:
   hub-db:
@@ -8,7 +8,7 @@ services:
     env_file:
       - secrets/mysql.env
     volumes:
-      - "db:${DB_VOLUME_CONTAINER}"
+      - "jupyterhub-db-data:${DB_VOLUME_CONTAINER}"
 
   hub:
     depends_on:
@@ -16,13 +16,15 @@ services:
     restart: always
     image: ${JUPYTERHUB_IMAGE}:dev
     container_name: jupyterhub
+    tty: True
+    command: "${JUPYTERHUB_CMD}"
     ports:
       - "8001:8000"
     volumes:
       # Bind Docker socket on the host so we can connect to the daemon from
       # within the container
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
-      - "data:${DATA_VOLUME_CONTAINER}"
+      - "jupyterhub-data:${DATA_VOLUME_CONTAINER}"
       - "${JUPYTERHUB_EXTVOL}:/ext"
     environment:
       # Pass debug flag through
@@ -47,14 +49,10 @@ services:
       - secrets/mysql.env
 
 volumes:
-  data:
-    external:
-      name: ${DATA_VOLUME_HOST}
-  db:
-    external:
-      name: ${DB_VOLUME_HOST}
+  jupyterhub-data:
+  jupyterhub-db-data:
 
 networks:
   default:
     external:
-      name: ${DOCKER_NETWORK_NAME}
+      name: "${DOCKER_NETWORK_NAME}"
