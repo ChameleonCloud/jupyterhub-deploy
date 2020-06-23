@@ -6,7 +6,8 @@ jupyterlab_zenodo~=0.2.0
 tqdm~=4.0
 
 # IPython kernels
-git+https://github.com/ChameleonCloud/bash_kernel@0.8.0-chameleon#egg=bash_kernel
+bash_kernel
+#git+https://github.com/ChameleonCloud/bash_kernel@0.8.0-chameleon#egg=bash_kernel
 
 # Commonly-used libraries
 ansible~=2.0
