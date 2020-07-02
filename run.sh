@@ -9,10 +9,33 @@ secret_dir="$DIR/secrets"
 
 usage() {
   cat <<USAGE
-Usage: run.sh [--single] [-e|--extension-dir DIR]
+Usage: run.sh [--single] [-e] [-h] 
 
+Start a local development environment, either for JupyterHub or for
+the configured single-user server.
 
+Options:
+  -s, --single: start a single-user container instead of the full
+    JupyterHub environment. The single-user container
+    is what is normally spawned by the hub, and can be
+    useful for debugging or testing extensions to the
+    Jupyter Notebook or JupyterLab applications. At container start
+    time, the custom extension is installed via local pip installation,
+    so that code changes are picked up automatically.
+  
+  -e, --extension-dir: a directory that contains a local extension,
+    either to JupyterHub or to JupyterLab (when --single is used).
+  
+  -h, --help: display this help text
+
+Examples:
+  # Run in hub mode (default)
+  ./run.sh
+
+  # Run in single-user mode with a local extension
+  ./run.sh --single --extension-dir ../path/to/extension
 USAGE
+  exit 1
 }
 
 while [[ $# -gt 0 ]]; do
@@ -21,8 +44,11 @@ while [[ $# -gt 0 ]]; do
       shift
       EXTENSION_DIR="$1"
       ;;
-    --single)
+    -s|--single)
       SINGLEUSER=1
+      ;;
+    -h|--help)
+      usage
       ;;
     *)
       usage
