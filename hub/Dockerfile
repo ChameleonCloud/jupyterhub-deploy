@@ -21,7 +21,7 @@ RUN apt-get update \
 
 RUN python3 -m pip wheel --wheel-dir wheelhouse \
       mysqlclient \
-      jupyterhub-keystoneauthenticator~=0.2.5 \
+      jupyterhub-keystoneauthenticator~=0.2.6 \
       git+https://github.com/chameleoncloud/dockerspawner.git@volume-drivers#egg=dockerspawner
 
 FROM base
