@@ -1,8 +1,8 @@
-# Python 3.7.6
+# Python 3.8
 # Notebook 6.0.3
-# JupyterLab 2.1.3
+# JupyterLab 2.1.4
 # JupyterHub 1.1.0
-FROM jupyter/minimal-notebook:76402a27fd13
+FROM jupyter/minimal-notebook:5197709e9f23
 
 USER root
 

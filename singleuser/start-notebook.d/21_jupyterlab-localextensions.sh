@@ -7,13 +7,25 @@ if [[ -d /ext ]]; then
 
   # Install Python extension code
   if [[ -f setup.py ]]; then
-    pip list | grep -q /ext || pip install -e .
-    # Hacky way to get the module name
-    module_dir=$(find . -maxdepth 2 -name __init__.py | xargs dirname)
-    for exttype in nbextension serverextension; do
-      jupyter "$exttype" enable --py ${module_dir##./} 2>>$err_log && break
-      echo "Failed installing $module_dir as $exttype. See $err_log for details."
-    done
+    pip list | sponge | grep -q /ext || {
+      pip install -e .
+      # Hacky way to get the module names
+      modules=$(find . -maxdepth 2 -name __init__.py | xargs dirname)
+      for mod in $modules; do
+        installed=
+        for exttype in nbextension serverextension; do
+          jupyter "$exttype" enable --py ${mod##./} 2>>$err_log && {
+            installed="$exttype"
+            break
+          }
+        done
+        if [[ -n "$installed" ]]; then
+          echo "Successfully installed $mod as $exttype."
+        else
+          echo "Failed installing $mod. See $err_log for details."
+        fi
+      done
+    }
   fi
 
   # Install JS extension code

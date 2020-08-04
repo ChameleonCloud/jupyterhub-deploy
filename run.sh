@@ -4,12 +4,13 @@ DIR="$(cd $(dirname ${BASH_SOURCE[0]}) 2>&1 >/dev/null && pwd)"
 
 EXTENSION_DIR=
 SINGLEUSER=0
+declare -a POSARGS=()
 
 secret_dir="$DIR/secrets"
 
 usage() {
   cat <<USAGE
-Usage: run.sh [--single] [-e] [-h] 
+Usage: run.sh [--single] [-e] [-h] [--] CMD
 
 Start a local development environment, either for JupyterHub or for
 the configured single-user server.
@@ -22,10 +23,13 @@ Options:
     Jupyter Notebook or JupyterLab applications. At container start
     time, the custom extension is installed via local pip installation,
     so that code changes are picked up automatically.
-  
+
   -e, --extension-dir: a directory that contains a local extension,
-    either to JupyterHub or to JupyterLab (when --single is used).
-  
+    either to JupyterHub or to JupyterLab (when --single is used.)
+
+  -w, --work-dir: a directory to mount as the working directory of the
+    singleuser Notebook server (only valid when --single is used.)
+
   -h, --help: display this help text
 
 Examples:
@@ -34,6 +38,9 @@ Examples:
 
   # Run in single-user mode with a local extension
   ./run.sh --single --extension-dir ../path/to/extension
+
+  # Run in single-user mode, but open a shell instead of the Notebook server
+  ./run.sh --single -- bash
 USAGE
   exit 1
 }
@@ -42,7 +49,11 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     -e|--extension-dir)
       shift
-      EXTENSION_DIR="$1"
+      EXTENSION_DIR="$(realpath $1)"
+      ;;
+    -w|--work-dir)
+      shift
+      WORK_DIR="$(realpath $1)"
       ;;
     -s|--single)
       SINGLEUSER=1
@@ -50,8 +61,15 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       usage
       ;;
+    --)
+      IN_POSARGS=1
+      ;;
     *)
-      usage
+      if [[ $IN_POSARGS -eq 1 ]]; then
+        POSARGS+=($1)
+      else
+        usage
+      fi
       ;;
   esac
   shift
@@ -89,6 +107,7 @@ if [[ "$SINGLEUSER" == "1" ]]; then
     run_cmd+=(--mount "type=bind,src=$EXTENSION_DIR,target=/ext")
   fi
   run_cmd+=("$JUPYTERHUB_SINGLEUSER_IMAGE:dev")
+  run_cmd+=("${POSARGS[@]:-start-notebook-dev.sh}")
   "${run_cmd[@]}"
 else
   if [[ -n "$EXTENSION_DIR" ]]; then

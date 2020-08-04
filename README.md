@@ -50,7 +50,7 @@ make hub-build singleuser-build
 Then, start up the JupyterHub stack. This will create a MySQL database and start the JupyterHub container.
 
 ```
-make hub-start
+./run.sh
 ```
 
 At this point, you should have a [JupyterHub server](http://localhost:8000) running on your localhost port 8000. You can log in to the JupyterHub server using your Chameleon credentials.
@@ -60,7 +60,7 @@ At this point, you should have a [JupyterHub server](http://localhost:8000) runn
 If you are testing some changes to just the single-user Notebook, it can be easier to just run the Notebook server by itself without the hub. To do this, there is a special start target that starts the Notebook, mounting the current working directory.
 
 ```
-make singleuser-start
+./run.sh --single
 ```
 
 When the Notebook starts, a `token` value will be outputted as part of a url. Navigate to the local [Notebook server](http://localhost:8888) and input this token to log in.
