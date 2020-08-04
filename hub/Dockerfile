@@ -40,7 +40,7 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
 
-RUN python3 -m pip install jupyterhub-chameleon~=0.0.6
+RUN python3 -m pip install jupyterhub-chameleon~=0.1.0
 
 COPY adminlist /srv/jupyterhub/adminlist
 
