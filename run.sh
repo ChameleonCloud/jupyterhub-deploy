@@ -2,15 +2,16 @@
 
 DIR="$(cd $(dirname ${BASH_SOURCE[0]}) 2>&1 >/dev/null && pwd)"
 
-EXTENSION_DIR=
 SINGLEUSER=0
+NOTEBOOK_EXTENSION=
+HUB_EXTENSION=
 declare -a POSARGS=()
 
 secret_dir="$DIR/secrets"
 
 usage() {
   cat <<USAGE
-Usage: run.sh [--single] [-e] [-h] [--] CMD
+Usage: run.sh [OPTIONS] [-- CMD]
 
 Start a local development environment, either for JupyterHub or for
 the configured single-user server.
@@ -24,8 +25,11 @@ Options:
     time, the custom extension is installed via local pip installation,
     so that code changes are picked up automatically.
 
-  -e, --extension-dir: a directory that contains a local extension,
-    either to JupyterHub or to JupyterLab (when --single is used.)
+  --hub-extension: a directory that contains a local extension for
+    JupyterHub.
+
+  --notebook-extension: a directory that contains a local extension
+    for the single-user Notebook application.
 
   -w, --work-dir: a directory to mount as the working directory of the
     singleuser Notebook server (only valid when --single is used.)
@@ -37,7 +41,7 @@ Examples:
   ./run.sh
 
   # Run in single-user mode with a local extension
-  ./run.sh --single --extension-dir ../path/to/extension
+  ./run.sh --single --notebook-extension ../path/to/extension
 
   # Run in single-user mode, but open a shell instead of the Notebook server
   ./run.sh --single -- bash
@@ -47,9 +51,13 @@ USAGE
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -e|--extension-dir)
+    --notebook-extension)
       shift
-      EXTENSION_DIR="$(realpath $1)"
+      NOTEBOOK_EXTENSION="$(realpath $1)"
+      ;;
+    --hub-extension)
+      shift
+      HUB_EXTENSION="$(realpath $1)"
       ;;
     -w|--work-dir)
       shift
@@ -101,18 +109,23 @@ if [[ "$SINGLEUSER" == "1" ]]; then
     --net "$DOCKER_NETWORK_NAME" \
 		--publish 8888:8888 \
 		--user root \
+    --env NOTEBOOK_PASSWORD="$NOTEBOOK_PASSWORD" \
 		--mount "type=volume,src=jupyter-work,target=/work" \
 		--workdir "/work")
-  if [[ -n "$EXTENSION_DIR" ]]; then
-    run_cmd+=(--mount "type=bind,src=$EXTENSION_DIR,target=/ext")
+  if [[ -n "$NOTEBOOK_EXTENSION" ]]; then
+    run_cmd+=(--mount "type=bind,src=$NOTEBOOK_EXTENSION,target=/ext")
   fi
-  run_cmd+=("$JUPYTERHUB_SINGLEUSER_IMAGE:dev")
+  run_cmd+=("$NOTEBOOK_IMAGE:dev")
   run_cmd+=("${POSARGS[@]:-start-notebook-dev.sh}")
   "${run_cmd[@]}"
 else
-  if [[ -n "$EXTENSION_DIR" ]]; then
-    export JUPYTERHUB_EXTVOL="$EXTENSION_DIR"
-    export JUPYTERHUB_CMD="bash"
+  hub_default_cmd=jupyterhub
+  if [[ -n "$HUB_EXTENSION" ]]; then
+    export JUPYTERHUB_EXTVOL="$HUB_EXTENSION"
   fi
-  docker-compose up
+  if [[ -n "$NOTEBOOK_EXTENSION" ]]; then
+    # A tricky case, running the Hub but desiring a local extension for the singleuser server
+    hub_default_cmd="jupyterhub --ChameleonSpawner.extra_volumes={\'$NOTEBOOK_EXTENSION\':\'/ext\'} --ChameleonSpawner.resource_limits=False"
+  fi
+  JUPYTERHUB_CMD="${POSARGS[@]:-$hub_default_cmd}" docker-compose up
 fi

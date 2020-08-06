@@ -1,6 +1,6 @@
 include .env
 
-JUPYTERHUB_SINGLEUSER_VERSION = $(shell git log -n1 --format=%h -- singleuser)
+NOTEBOOK_VERSION = $(shell git log -n1 --format=%h -- singleuser)
 JUPYTERHUB_VERSION = $(shell git log -n1 --format=%h -- hub)
 
 REGISTRY := docker.chameleoncloud.org
@@ -29,18 +29,18 @@ hub-publish-latest:
 
 .PHONY: singleuser-build
 singleuser-build:
-	docker build -t $(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION) singleuser
+	docker build -t $(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) singleuser
 	# Tag for local development
-	docker tag $(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION) $(JUPYTERHUB_SINGLEUSER_IMAGE):dev
+	docker tag $(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) $(NOTEBOOK_IMAGE):dev
 
 .PHONY: singleuser-publish
 singleuser-publish:
-	docker tag $(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION) \
-		         $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION)
-	docker push $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION)
+	docker tag $(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) \
+		         $(REGISTRY)/$(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION)
+	docker push $(REGISTRY)/$(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION)
 
 .PHONY: singleuser-publish-latest
 singleuser-publish-latest:
-	docker tag $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):$(JUPYTERHUB_SINGLEUSER_VERSION) \
-				$(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):latest
-	docker push $(REGISTRY)/$(JUPYTERHUB_SINGLEUSER_IMAGE):latest
+	docker tag $(REGISTRY)/$(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) \
+				$(REGISTRY)/$(NOTEBOOK_IMAGE):latest
+	docker push $(REGISTRY)/$(NOTEBOOK_IMAGE):latest

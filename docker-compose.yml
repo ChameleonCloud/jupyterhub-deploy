@@ -30,7 +30,7 @@ services:
       # The container directory that will hold the user's working files
       DOCKER_NOTEBOOK_DIR: /work
       # JupyterHub will spawn this Notebook image for users
-      DOCKER_NOTEBOOK_IMAGE: ${JUPYTERHUB_SINGLEUSER_IMAGE}:dev
+      DOCKER_NOTEBOOK_IMAGE: ${NOTEBOOK_IMAGE}:dev
       # Point to MySQL container
       MYSQL_HOST: hub-db
     env_file:
