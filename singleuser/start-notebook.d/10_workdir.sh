@@ -47,33 +47,42 @@ setup_default_server() {
 }
 
 setup_experiment_server() {
-  if [[ -z "$SRC_PATH" ]]; then
-    echo "No source path defined!"
-    exit 1
-  fi
-
-  case "$IMPORT_SRC" in
-    git)
-      # Allow any remote repository
-      git_fetch $SRC_PATH $workdir
-      ;;
-    github)
-      # Convenience; just specify repo name
-      git_fetch https://github.com/$SRC_PATH $workdir
-      ;;
-    zenodo|zenodo_sandbox)
-      if [[ "$IMPORT_SRC" == *sandbox ]]; then
-        zenodo_fetch https://sandbox.zenodo.org "$SRC_PATH" $workdir
-      else
-        zenodo_fetch https://zenodo.org "$SRC_PATH" $workdir
-      fi
-      ;;
-    *)
-      echo "Unknown import source '$IMPORT_SRC'."
-      echo "Supported values are 'git', 'github', 'zenodo', 'zenodo_sandbox'"
+  if [[ -n "$IMPORT_URL" ]]; then
+    if [[ "${IMPORT_REPO:-}" == "git" ]]; then
+      git_fetch "$IMPORT_URL" $workdir
+    else
+      wget -P $workdir "$IMPORT_URL"
+    fi
+  else
+    # NOTE(jason): this method of importing is deprecated
+    if [[ -z "$SRC_PATH" ]]; then
+      echo "No source path defined!"
       exit 1
-      ;;
-  esac
+    fi
+
+    case "$IMPORT_SRC" in
+      git)
+        # Allow any remote repository
+        git_fetch $SRC_PATH $workdir
+        ;;
+      github)
+        # Convenience; just specify repo name
+        git_fetch https://github.com/$SRC_PATH $workdir
+        ;;
+      zenodo|zenodo_sandbox)
+        if [[ "$IMPORT_SRC" == *sandbox ]]; then
+          zenodo_fetch https://sandbox.zenodo.org "$SRC_PATH" $workdir
+        else
+          zenodo_fetch https://zenodo.org "$SRC_PATH" $workdir
+        fi
+        ;;
+      *)
+        echo "Unknown import source '$IMPORT_SRC'."
+        echo "Supported values are 'git', 'github', 'zenodo', 'zenodo_sandbox'"
+        exit 1
+        ;;
+    esac
+  fi
 
   pushd $workdir
   if [[ -f "requirements.txt" ]]; then
