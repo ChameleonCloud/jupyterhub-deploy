@@ -53,6 +53,8 @@ setup_experiment_server() {
     else
       wget -P $workdir "$IMPORT_URL"
     fi
+    unset IMPORT_URL
+    unset IMPORT_REPO
   else
     # NOTE(jason): this method of importing is deprecated
     if [[ -z "$SRC_PATH" ]]; then
