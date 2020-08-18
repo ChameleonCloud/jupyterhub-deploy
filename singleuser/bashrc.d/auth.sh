@@ -2,7 +2,7 @@
 # Access tokens have a relatively short TTL and can expire quickly.
 
 _with_token() {
-  access_token=$(curl -H"authorization: token $JUPYTERHUB_API_TOKEN" \
+  access_token=$(curl -s -H"authorization: token $JUPYTERHUB_API_TOKEN" \
     "$JUPYTERHUB_API_URL/tokens" \
     | jq -r .access_token)
   if [[ "$access_token" != "null" ]]; then

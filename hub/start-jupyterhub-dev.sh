@@ -11,4 +11,10 @@ if [[ -d /ext ]]; then
   popd 2>/dev/null
 fi
 
-"$@"
+declare -a cmd=(jupyterhub)
+if [[ -n "$NOTEBOOK_EXTENSION" ]]; then
+  cmd+=(--ChameleonSpawner.extra_volumes={\'$NOTEBOOK_EXTENSION\':\'/ext\'})
+fi
+cmd+=(--ChameleonSpawner.resource_limits=False)
+
+"${cmd[@]}"

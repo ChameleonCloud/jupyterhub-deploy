@@ -10,8 +10,9 @@ if [[ -f .env ]]; then
 fi
 
 start-notebook.sh --app-dir=/home/jovyan/.jupyter/lab \
-  --NotebookApp.password="" \
+  --NotebookApp.password="$NOTEBOOK_PASSWORD" \
   --NotebookApp.tornado_settings={\'autoreload\':True} \
   --ZenodoConfig.dev=True \
   --ZenodoConfig.access_token="${ZENODO_DEFAULT_ACCESS_TOKEN:-fake}" \
+  --watch \
   "$@"

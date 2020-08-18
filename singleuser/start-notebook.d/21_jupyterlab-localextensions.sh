@@ -34,6 +34,10 @@ if [[ -d /ext ]]; then
       npm run build
       jupyter labextension link --app-dir="$app_dir" .
     }
+    # For some reason, LabApp traitlet overrides passed to jupyterhub-singleuser
+    # over the CLI don't seem to stick. This env variable though will affect
+    # the app directory it uses on boot, which is what we want.
+    export JUPYTERLAB_DIR="$app_dir"
   fi
 
   popd 2>/dev/null

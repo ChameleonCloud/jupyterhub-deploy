@@ -53,11 +53,11 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --notebook-extension)
       shift
-      NOTEBOOK_EXTENSION="$(realpath $1)"
+      export NOTEBOOK_EXTENSION="$(realpath $1)"
       ;;
     --hub-extension)
       shift
-      HUB_EXTENSION="$(realpath $1)"
+      export HUB_EXTENSION="$(realpath $1)"
       ;;
     -w|--work-dir)
       shift
@@ -119,13 +119,6 @@ if [[ "$SINGLEUSER" == "1" ]]; then
   run_cmd+=("${POSARGS[@]:-start-notebook-dev.sh}")
   "${run_cmd[@]}"
 else
-  hub_default_cmd=jupyterhub
-  if [[ -n "$HUB_EXTENSION" ]]; then
-    export JUPYTERHUB_EXTVOL="$HUB_EXTENSION"
-  fi
-  if [[ -n "$NOTEBOOK_EXTENSION" ]]; then
-    # A tricky case, running the Hub but desiring a local extension for the singleuser server
-    hub_default_cmd="jupyterhub --ChameleonSpawner.extra_volumes={\'$NOTEBOOK_EXTENSION\':\'/ext\'} --ChameleonSpawner.resource_limits=False"
-  fi
-  JUPYTERHUB_CMD="${POSARGS[@]:-$hub_default_cmd}" docker-compose up
+  # Default hub extension otherwise docker-compose.yml mount config is invalid.
+  HUB_EXTENSION="${HUB_EXTENSION:-/tmp}" docker-compose up
 fi

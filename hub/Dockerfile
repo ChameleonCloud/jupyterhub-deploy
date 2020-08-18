@@ -35,13 +35,12 @@ FROM base
 COPY --from=builder /src/jupyterhub/wheelhouse /tmp/wheelhouse-custom
 RUN python3 -m pip install --no-cache /tmp/wheelhouse-custom/*
 
-COPY entrypoint.sh /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
+WORKDIR /srv/jupyterhub
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
 
 RUN python3 -m pip install jupyterhub-chameleon~=0.1.0
 
+COPY start-jupyterhub-dev.sh /usr/local/bin/
 COPY adminlist /srv/jupyterhub/adminlist
 
-CMD ["jupyterhub", "-f", "/srv/jupyterhub/jupyterhub_config.py"]
+CMD ["jupyterhub"]
