@@ -86,13 +86,3 @@ JUPYTERHUB_SINGLEUSER_EXTDIR=$(realpath ..) make singleuser-shell
 > `jupyter serverextension disable <module> && pip uninstall <module>`
 >
 > Otherwise, you may run in to odd behavior where the updated module is not properly linked in to the Jupyter server.
-
-### Testing Zenodo publish flow
-
-Currently, the sharing portal publish flow via Zenodo requires an [access token](https://developers.zenodo.org/#creating-a-personal-access-token), which is defined via an env variable `ZENODO_DEFAULT_ACCESS_TOKEN`. To set this for a local build, add it to the `./secrets/jupyterhub.env` file; those env variables are automatically sourced into the JupyterHub environment and passed to the single-user environments as Notebook configuration parameters.
-
-If you want to test with just the single-user environment, use the `singleuser-shell` target to get an interactive shell into the Notebook environment and, instead of setting the value with an environment variable, pass it directly as a flag to the Notebook start script:
-
-```bash
-start-notebook.sh --ZenodoConfig.access_token='<token>'
-```

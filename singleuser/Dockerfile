@@ -30,12 +30,10 @@ RUN curl -Lo /tmp/xoStitch.deb \
 #
 
 RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager@2.0
-# NOTE(jason): can re-enable when https://github.com/jupyterlab/jupyterlab-latex/issues/135
-# is resolved.
-# RUN jupyter labextension install --no-build @jupyterlab/latex@2.0.0
+RUN jupyter labextension install --no-build @jupyterlab/latex@2.0.1
 RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-theme-extension@2.0.0
 RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_swift@2.0.2
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_zenodo@2.0.0
+RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-chameleon@1.0.0
 RUN jupyter lab build
 
 #
@@ -74,10 +72,5 @@ COPY serverroot/* /etc/jupyter/serverroot/
 
 COPY bashrc.d /home/$NB_USER/.bashrc.d
 COPY start-notebook-dev.sh /usr/local/bin/
-
-COPY jupyter_notebook_config.py.append /tmp/
-RUN cat /etc/jupyter/jupyter_notebook_config.py \
-        /tmp/jupyter_notebook_config.py.append \
-    | sponge /etc/jupyter/jupyter_notebook_config.py
 
 USER $NB_USER

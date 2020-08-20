@@ -30,17 +30,6 @@ git_fetch() {
   fi
 }
 
-zenodo_fetch() {
-  local api_base="$1"
-  local doi="$2"
-  local dest="$3"
-
-  local record_id=$(sed 's/^[0-9\.]*\/zenodo\.//' <<<"$doi")
-  curl -L "$api_base/api/records/$record_id" \
-    | jq -r .files[].links.self \
-    | xargs -L1 wget -P $dest
-}
-
 setup_default_server() {
   # Copy examples and other "first launch" files over.
   rsync -aq /etc/jupyter/serverroot/ $workdir/
@@ -48,48 +37,17 @@ setup_default_server() {
 }
 
 setup_experiment_server() {
-  if [[ -n "$IMPORT_URL" ]]; then
-    if [[ "${IMPORT_REPO:-}" == "git" ]]; then
-      git_fetch "$IMPORT_URL" $workdir
-    else
-      wget -P $workdir -O $archive "$IMPORT_URL"
-    fi
-    unset IMPORT_URL
-    unset IMPORT_REPO
+  if [[ "${IMPORT_REPO:-}" == "git" ]]; then
+    git_fetch "$IMPORT_URL" $workdir
   else
-    # NOTE(jason): this method of importing is deprecated
-    if [[ -z "$SRC_PATH" ]]; then
-      echo "No source path defined!"
-      exit 1
-    fi
-
-    case "$IMPORT_SRC" in
-      git)
-        # Allow any remote repository
-        git_fetch $SRC_PATH $workdir
-        ;;
-      github)
-        # Convenience; just specify repo name
-        git_fetch https://github.com/$SRC_PATH $workdir
-        ;;
-      zenodo|zenodo_sandbox)
-        if [[ "$IMPORT_SRC" == *sandbox ]]; then
-          zenodo_fetch https://sandbox.zenodo.org "$SRC_PATH" $workdir
-        else
-          zenodo_fetch https://zenodo.org "$SRC_PATH" $workdir
-        fi
-        ;;
-      *)
-        echo "Unknown import source '$IMPORT_SRC'."
-        echo "Supported values are 'git', 'github', 'zenodo', 'zenodo_sandbox'"
-        exit 1
-        ;;
-    esac
+    wget -P $workdir -O $archive "$IMPORT_URL"
   fi
+  unset IMPORT_URL
+  unset IMPORT_REPO
 
   pushd $workdir
   if [[ -f $archive ]]; then
-    unzip -d $workdir $archive || tar -C $workdir xf $archive \
+    unzip -d $workdir $archive || tar -C $workdir -xf $archive \
       && rm $archive || echo "Failed to extract $archive"
   fi
   if [[ -f requirements.txt ]]; then
@@ -102,7 +60,7 @@ setup_experiment_server() {
   # rm -rf /home/jovyan/exp && ln -s $expdir /home/jovyan/exp
 }
 
-if [[ -n "${IMPORT_SRC}" || -n "${IMPORT_URL}" ]]; then
+if [[ -n "${IMPORT_URL}" ]]; then
   setup_experiment_server
 else
   setup_default_server

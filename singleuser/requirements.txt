@@ -1,8 +1,8 @@
 # JupyterLab extensions
 ipywidgets~=7.5
+jupyterlab_chameleon~=1.0.0
 jupyterlab_latex~=2.0
 jupyterlab_swift~=0.2.5
-jupyterlab_zenodo~=0.2.0
 tqdm~=4.0
 
 # IPython kernels
