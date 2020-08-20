@@ -2,6 +2,7 @@ set -x
 
 workdir=/work
 expdir=/exp
+archive=/tmp/_archive
 
 # Remove artifacts from mounting remote volume
 rm -rf "$workdir/lost+found"
@@ -51,7 +52,7 @@ setup_experiment_server() {
     if [[ "${IMPORT_REPO:-}" == "git" ]]; then
       git_fetch "$IMPORT_URL" $workdir
     else
-      wget -P $workdir "$IMPORT_URL"
+      wget -P $workdir -O $archive "$IMPORT_URL"
     fi
     unset IMPORT_URL
     unset IMPORT_REPO
@@ -87,21 +88,24 @@ setup_experiment_server() {
   fi
 
   pushd $workdir
-  if [[ -f "requirements.txt" ]]; then
-     pip install -r "requirements.txt"
+  if [[ -f $archive ]]; then
+    unzip -d $workdir $archive || tar -C $workdir xf $archive \
+      && rm $archive || echo "Failed to extract $archive"
   fi
-  unzip *.zip && rm *.zip || echo "No archives to unzip"
-  # TODO: automatic tarball extraction
+  if [[ -f requirements.txt ]]; then
+    echo "Installing pip requirements"
+    pip install -r requirements.txt
+  fi
   popd
 
   # TODO: use separate experiment directory for named servers?
   # rm -rf /home/jovyan/exp && ln -s $expdir /home/jovyan/exp
 }
 
-if [[ -z "${IMPORT_SRC+x}" ]]; then
-  setup_default_server
-else
+if [[ -n "${IMPORT_SRC}" || -n "${IMPORT_URL}" ]]; then
   setup_experiment_server
+else
+  setup_default_server
 fi
 
 # Our volume mount is at the root directory, link it in to the user's
