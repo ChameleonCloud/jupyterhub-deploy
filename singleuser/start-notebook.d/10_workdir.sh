@@ -37,13 +37,14 @@ setup_default_server() {
 }
 
 setup_experiment_server() {
-  if [[ "${IMPORT_REPO:-}" == "git" ]]; then
-    git_fetch "$IMPORT_URL" $workdir
+  if [[ "${ARTIFACT_DEPOSITION_REPO:-}" == "git" ]]; then
+    git_fetch "$ARTIFACT_DEPOSITION_URL" $workdir
   else
-    wget -P $workdir -O $archive "$IMPORT_URL"
+    wget -P $workdir -O $archive "$ARTIFACT_DEPOSITION_URL"
   fi
-  unset IMPORT_URL
-  unset IMPORT_REPO
+  # Deposition URL may contain sensitive information (e.g. creds that are
+  # valid for some TTL.)
+  unset ARTIFACT_DEPOSITION_URL
 
   pushd $workdir
   if [[ -f $archive ]]; then
@@ -60,7 +61,7 @@ setup_experiment_server() {
   # rm -rf /home/jovyan/exp && ln -s $expdir /home/jovyan/exp
 }
 
-if [[ -n "${IMPORT_URL}" ]]; then
+if [[ -n "${ARTIFACT_DEPOSITION_URL}" ]]; then
   setup_experiment_server
 else
   setup_default_server
