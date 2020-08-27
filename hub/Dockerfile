@@ -38,7 +38,7 @@ RUN python3 -m pip install --no-cache /tmp/wheelhouse-custom/*
 WORKDIR /srv/jupyterhub
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
 
-RUN python3 -m pip install jupyterhub-chameleon~=1.0.1
+RUN python3 -m pip install jupyterhub-chameleon~=1.1.0
 
 COPY start-jupyterhub-dev.sh /usr/local/bin/
 COPY adminlist /srv/jupyterhub/adminlist
