@@ -20,6 +20,11 @@ import jupyterhub_chameleon
 
 c = get_config()
 
+##################
+# Chameleon
+##################
+
+# Most configuration is handled by the jupyterhub-chameleon package
 jupyterhub_chameleon.install_extension(c)
 
 ##################
