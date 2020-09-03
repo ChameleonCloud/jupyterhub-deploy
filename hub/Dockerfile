@@ -9,7 +9,7 @@ RUN apt-get update \
 FROM base as builder
 
 WORKDIR /src/jupyterhub
-RUN python3 -m pip install --upgrade wheel
+RUN python3 -m pip install --upgrade setuptools wheel
 
 RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
