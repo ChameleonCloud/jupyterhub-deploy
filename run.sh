@@ -2,7 +2,7 @@
 
 DIR="$(cd $(dirname ${BASH_SOURCE[0]}) 2>&1 >/dev/null && pwd)"
 
-SINGLEUSER=0
+NOTEBOOK_ONLY=0
 NOTEBOOK_EXTENSION=
 HUB_EXTENSION=
 declare -a POSARGS=()
@@ -14,11 +14,11 @@ usage() {
 Usage: run.sh [OPTIONS] [-- CMD]
 
 Start a local development environment, either for JupyterHub or for
-the configured single-user server.
+the configured Notebook server.
 
 Options:
-  -s, --single: start a single-user container instead of the full
-    JupyterHub environment. The single-user container
+  -n, --notebook-only: start a Notebook server container instead of
+    the full JupyterHub environment. The Notebook container
     is what is normally spawned by the hub, and can be
     useful for debugging or testing extensions to the
     Jupyter Notebook or JupyterLab applications. At container start
@@ -29,10 +29,10 @@ Options:
     JupyterHub.
 
   --notebook-extension: a directory that contains a local extension
-    for the single-user Notebook application.
+    for the Notebook application.
 
   -w, --work-dir: a directory to mount as the working directory of the
-    singleuser Notebook server (only valid when --single is used.)
+    Notebook server (only valid when --notebook-only is used.)
 
   -h, --help: display this help text
 
@@ -40,11 +40,11 @@ Examples:
   # Run in hub mode (default)
   ./run.sh
 
-  # Run in single-user mode with a local extension
-  ./run.sh --single --notebook-extension ../path/to/extension
+  # Run just the Notebook with a local extension
+  ./run.sh --notebook-only --notebook-extension ../path/to/extension
 
-  # Run in single-user mode, but open a shell instead of the Notebook server
-  ./run.sh --single -- bash
+  # Run just the Notebook, but open a shell instead of the Notebook server
+  ./run.sh --notebook-only -- bash
 USAGE
   exit 1
 }
@@ -63,8 +63,8 @@ while [[ $# -gt 0 ]]; do
       shift
       WORK_DIR="$(realpath $1)"
       ;;
-    -s|--single)
-      SINGLEUSER=1
+    -n|--notebook-only)
+      NOTEBOOK_ONLY=1
       ;;
     -h|--help)
       usage
@@ -104,7 +104,7 @@ docker network inspect "$DOCKER_NETWORK_NAME" >/dev/null \
 
 pushd "$DIR" >/dev/null
 
-if [[ "$SINGLEUSER" == "1" ]]; then
+if [[ "$NOTEBOOK_ONLY" == "1" ]]; then
   declare -a run_cmd=(docker run --rm --interactive --tty \
     --net "$DOCKER_NETWORK_NAME" \
 		--publish 8888:8888 \
