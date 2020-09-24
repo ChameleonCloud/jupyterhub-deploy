@@ -40,12 +40,12 @@ RUN jupyter lab build
 # (Includes Notebook server extension dependencies)
 #
 
-COPY requirements.txt /tmp/singleuser-requirements.txt
+COPY requirements.txt /tmp/notebook-requirements.txt
 
 ARG openstack_release=train
 RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstack/requirements/stable/${openstack_release}/upper-constraints.txt" \
-  && python3 -m pip install --no-cache -r /tmp/singleuser-requirements.txt \
-  && rm -f /tmp/singleuser-requirements.txt
+  && python3 -m pip install --no-cache -r /tmp/notebook-requirements.txt \
+  && rm -f /tmp/notebook-requirements.txt
 
 #
 # Enable server extensions
