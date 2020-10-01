@@ -4,7 +4,8 @@ DIR="$(cd $(dirname ${BASH_SOURCE[0]}) 2>&1 >/dev/null && pwd)"
 
 NOTEBOOK_ONLY=0
 NOTEBOOK_EXTENSION=
-HUB_EXTENSION=
+# Default hub extension otherwise docker-compose.yml mount config is invalid.
+HUB_EXTENSION=/tmp
 declare -a POSARGS=()
 
 secret_dir="$DIR/secrets"
@@ -53,11 +54,11 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --notebook-extension)
       shift
-      export NOTEBOOK_EXTENSION="$(realpath $1)"
+      NOTEBOOK_EXTENSION="$(realpath $1)"
       ;;
     --hub-extension)
       shift
-      export HUB_EXTENSION="$(realpath $1)"
+      HUB_EXTENSION="$(realpath $1)"
       ;;
     -w|--work-dir)
       shift
@@ -119,6 +120,6 @@ if [[ "$NOTEBOOK_ONLY" == "1" ]]; then
   run_cmd+=("${POSARGS[@]:-start-notebook-dev.sh}")
   "${run_cmd[@]}"
 else
-  # Default hub extension otherwise docker-compose.yml mount config is invalid.
-  HUB_EXTENSION="${HUB_EXTENSION:-/tmp}" docker-compose up
+  NOTEBOOK_EXTENSION="$NOTEBOOK_EXTENSION" HUB_EXTENSION="$HUB_EXTENSION" \
+    docker-compose up
 fi
