@@ -1,0 +1,2 @@
+# ChameleonCloud-provided
+jupyterhub-chameleon~=1.2.5
