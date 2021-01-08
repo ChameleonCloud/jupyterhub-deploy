@@ -55,7 +55,7 @@ setup_experiment_server() {
   pushd $workdir
 
   if [[ -n "${archivefile:-}" ]]; then
-    unzip -d $workdir $archivefile || tar -C $workdir -xf $archivefile \
+    unzip -n -d $workdir $archivefile || tar -C $workdir -xf $archivefile \
       && rm $archivefile || {
         echo "Failed to extract $archivefile, copying entire file."
         # Maybe it is not an archive, but a single file. Just copy.
