@@ -4,6 +4,10 @@ workdir=/work
 expdir=/exp
 archive=/tmp/_archive
 
+if [[ ! -d "$workdir" ]]; then
+  mkdir -p "$workdir"
+fi
+
 # Remove artifacts from mounting remote volume
 rm -rf "$workdir/lost+found"
 
