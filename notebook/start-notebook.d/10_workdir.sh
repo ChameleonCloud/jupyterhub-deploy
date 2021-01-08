@@ -49,7 +49,11 @@ setup_experiment_server() {
   pushd $workdir
   if [[ -f $archive ]]; then
     unzip -d $workdir $archive || tar -C $workdir -xf $archive \
-      && rm $archive || echo "Failed to extract $archive"
+      && rm $archive || {
+        echo "Failed to extract $archive, copying entire file."
+        # Maybe it is not an archive, but a single file. Just copy.
+        cp $archive $workdir/
+      }
   fi
   if [[ -f requirements.txt ]]; then
     echo "Installing pip requirements"
