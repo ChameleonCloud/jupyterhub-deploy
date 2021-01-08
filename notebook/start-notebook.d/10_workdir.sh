@@ -46,7 +46,7 @@ setup_experiment_server() {
   else
     mkdir -p $archivedir
     wget -P $archivedir "$ARTIFACT_DEPOSITION_URL"
-    archivefile="$(find $archivedir -type f -exec basename {} \; | head -n1)"
+    archivefile="$archivedir/$(find $archivedir -type f -exec basename {} \; | head -n1)"
   fi
   # Deposition URL may contain sensitive information (e.g. creds that are
   # valid for some TTL.)
