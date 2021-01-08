@@ -2,7 +2,7 @@ set -x
 
 workdir=/work
 expdir=/exp
-archive=/tmp/_archive
+archivedir=/tmp/_archive
 
 if [[ ! -d "$workdir" ]]; then
   mkdir -p "$workdir"
@@ -44,19 +44,22 @@ setup_experiment_server() {
   if [[ "${ARTIFACT_DEPOSITION_REPO:-}" == "git" ]]; then
     git_fetch "$ARTIFACT_DEPOSITION_URL" $workdir
   else
-    wget -P $workdir -O $archive "$ARTIFACT_DEPOSITION_URL"
+    mkdir -p $archivedir
+    wget -P $archivedir "$ARTIFACT_DEPOSITION_URL"
+    archivefile="$(find $archivedir -type f -exec basename {} \; | head -n1)"
   fi
   # Deposition URL may contain sensitive information (e.g. creds that are
   # valid for some TTL.)
   unset ARTIFACT_DEPOSITION_URL
 
   pushd $workdir
-  if [[ -f $archive ]]; then
-    unzip -d $workdir $archive || tar -C $workdir -xf $archive \
-      && rm $archive || {
-        echo "Failed to extract $archive, copying entire file."
+
+  if [[ -n "${archivefile:-}" ]]; then
+    unzip -d $workdir $archivefile || tar -C $workdir -xf $archivefile \
+      && rm $archivefile || {
+        echo "Failed to extract $archivefile, copying entire file."
         # Maybe it is not an archive, but a single file. Just copy.
-        cp $archive $workdir/
+        cp $archivefile $workdir/
       }
   fi
   if [[ -f requirements.txt ]]; then
