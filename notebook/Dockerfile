@@ -32,7 +32,7 @@ RUN curl -Lo /tmp/xoStitch.deb \
 RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager@2.0
 RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-theme-extension@2.0.0
 RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_swift@2.0.2
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-chameleon@1.1.2
+RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-chameleon@1.2.0
 RUN jupyter lab build
 
 #
