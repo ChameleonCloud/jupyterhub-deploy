@@ -53,14 +53,14 @@ Then, start up the JupyterHub stack. This will create a MySQL database and start
 ./run.sh
 ```
 
-At this point, you should have a [JupyterHub server](http://localhost:8000) running on your localhost port 8000. You can log in to the JupyterHub server using your Chameleon credentials.
+At this point, you should have a [JupyterHub server](http://127.0.0.1:8001) running on your localhost port 8000. You can log in to the JupyterHub server using your Chameleon credentials.
 
 ### Running just the Notebook server
 
 If you are testing some changes to just the Notebook application environment, it can be easier to just run the Notebook server by itself without the hub. To do this, there is a special start target that starts the Notebook, mounting the current working directory.
 
 ```
-./run.sh --single
+./run.sh --notebook-only
 ```
 
 When the Notebook starts, a `token` value will be outputted as part of a url. Navigate to the local [Notebook server](http://localhost:8888) and input this token to log in.
@@ -69,7 +69,7 @@ To change the Notebook working directory, use the `--work-dir DIR` option. This 
 
 ```
 # Mounts the parent directory instead of current working directory
-./run.sh -s --work-dir ../
+./run.sh -n --work-dir ../
 ```
 
 #### Mounting a local extension
@@ -78,7 +78,7 @@ If you are doing local JupyterLab extension development, you likely want an easy
 
 ```
 # Mounts a special directory containing a local extension
-./run.sh -s --notebook-extension ../path/to/extension
+./run.sh -n --notebook-extension ../path/to/extension
 ```
 
 > **Note**: If you are testing a local extension which has a released copy already installed to the notebook image, you should uninstall the installed version first:
@@ -86,3 +86,34 @@ If you are doing local JupyterLab extension development, you likely want an easy
 > `jupyter serverextension disable <module> && pip uninstall <module>`
 >
 > Otherwise, you may run in to odd behavior where the updated module is not properly linked in to the Jupyter server.
+
+### Running with custom Hub and Notebook extensions
+
+If you want to use _both_ a custom Hub extension and a Notebook extension,
+you can provide both:
+
+```
+./run.sh --hub-extension ../path/to/hub/extension --notebook-extension ../path/to/nb/extension
+```
+
+In this case, the Hub will restart on changes to the Hub extension's Python
+files, and the Notebook server will similarly restart when changes to its
+server extension Python files are detected.
+
+> *Note*: If your Notebook extension has a client-side component, it will take
+> a _long_ time to spawn the server, because it will be dynamically building
+> your extension for the first time when the server loads, inside a Docker
+> container with all the performance implications that can have.
+
+If you want to also recompile the
+client JS components when their assets change, currently the only way I've
+found to get this working is to `exec` into the Notebook server after it's
+launched and start another JupyterLab process with the `--watch` flag.
+
+```
+docker exec -u jovyan jupyter-<username> jupyter lab --watch --app-dir=/home/jovyan/.jupyter/lab
+```
+
+> *Note*: the `-u` flag and the `--app-dir` flags are important; they ensure
+> the process runs under the Notebook server user, so permissions remain OK,
+> and point the build to the directory where the "main" server runs from.

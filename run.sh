@@ -54,11 +54,11 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --notebook-extension)
       shift
-      NOTEBOOK_EXTENSION="$(realpath $1)"
+      export NOTEBOOK_EXTENSION="$(realpath $1)"
       ;;
     --hub-extension)
       shift
-      HUB_EXTENSION="$(realpath $1)"
+      export HUB_EXTENSION="$(realpath $1)"
       ;;
     -w|--work-dir)
       shift
@@ -120,6 +120,8 @@ if [[ "$NOTEBOOK_ONLY" == "1" ]]; then
   run_cmd+=("${POSARGS[@]:-start-notebook-dev.sh}")
   "${run_cmd[@]}"
 else
-  NOTEBOOK_EXTENSION="$NOTEBOOK_EXTENSION" HUB_EXTENSION="$HUB_EXTENSION" \
-    docker-compose up
+  if [[ "$(uname)" == "Darwin" ]]; then
+    export ENTR_INOTIFY_WORKAROUND=1
+  fi
+  docker-compose up
 fi

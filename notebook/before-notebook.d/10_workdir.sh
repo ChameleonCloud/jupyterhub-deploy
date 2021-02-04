@@ -7,3 +7,8 @@ fi
 
 # Fix permissions on entire home directory
 chown -R "$NB_USER:" "/home/$NB_USER"
+
+# The default terminal directory is the directory Jupyter was started
+# from--it makes the most sense for this to equal the notebook_dir, which
+# is ~/work
+cd "/home/$NB_USER/work"

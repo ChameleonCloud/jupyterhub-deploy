@@ -9,9 +9,9 @@ REGISTRY := docker.chameleoncloud.org
 
 .PHONY: hub-build
 hub-build: hub/cull_idle_servers.py
-	docker build -t $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) hub
+	docker build -t $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) --target release hub
 	# Tag for local development
-	docker tag $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) $(JUPYTERHUB_IMAGE):dev
+	docker build -t $(JUPYTERHUB_IMAGE):dev --target dev hub
 
 .PHONY: hub-publish
 hub-publish:

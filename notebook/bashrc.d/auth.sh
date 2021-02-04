@@ -14,3 +14,5 @@ export -f _with_token
 
 alias openstack='_with_token openstack'
 alias blazar='_with_token blazar'
+# Users shouldn't really be using this, but they try sometimes.
+alias swift='_with_token swift'

@@ -31,6 +31,7 @@ if [[ -d /ext ]]; then
   # Install JS extension code
   if [[ -f package.json ]]; then
     jupyter labextension list --app-dir="$app_dir" 2>/dev/null | grep -q /ext || {
+      # Ensure Typescript has been compiled
       npm run build
       jupyter labextension link --app-dir="$app_dir" .
     }

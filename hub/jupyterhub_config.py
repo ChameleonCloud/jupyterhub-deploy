@@ -14,7 +14,6 @@
 # See the README for the jupyterhub-chameleon module for more options.
 # https://github.com/chameleoncloud/jupyterhub-chameleon
 import os
-import sys
 
 import jupyterhub_chameleon
 
@@ -26,6 +25,13 @@ c = get_config()
 
 # Most configuration is handled by the jupyterhub-chameleon package
 jupyterhub_chameleon.install_extension(c)
+
+if c.ChameleonSpawner.debug:
+    c.ChameleonSpawner.cmd = [
+        "start-notebook.sh",
+        "--LabApp.watch=True",
+        "--NotebookApp.tornado_settings={\'autoreload\':True}",
+    ]
 
 ##################
 # Hub

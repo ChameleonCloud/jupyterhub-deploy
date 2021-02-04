@@ -35,6 +35,8 @@ services:
       NOTEBOOK_PASSWORD: ${NOTEBOOK_PASSWORD}
       # Point to MySQL container
       MYSQL_HOST: hub-db
+      # Workaround for watch mode on Mac
+      ENTR_INOTIFY_WORKAROUND: ${ENTR_INOTIFY_WORKAROUND}
     env_file:
       - .env
       - secrets/jupyterhub.env
