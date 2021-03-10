@@ -4,6 +4,37 @@
 # OpenStack CLI, but some things are a bit trickier; namely, getting
 # resources currently associated with a lease.
 
+# use_site SITE
+#
+# Configures the local shell to point to the specified Chameleon site.
+# This allows changing which site a command will operate against.
+#
+# Example:
+#    use_site CHI@UC
+#
+use_site() {
+  local site_name="$1"
+  local site="$(curl --silent --location https://api.chameleoncloud.org/sites.json \
+    | jq ".items | map(select(.name==\"$site_name\")) | first")"
+  if [[ $? -gt 0 || "$site" == "null" ]]; then
+    echo -n "Could not find site '$site_name'! Possible options are: "
+    curl --silent --location https://api.chameleoncloud.org/sites.json \
+      | jq -r '.items[].name' \
+      | xargs echo
+    return 1
+  fi
+  local site_url="$(jq -r .web <<<"$site")"
+  export OS_AUTH_URL="${site_url}:5000/v3"
+  unset OS_REGION_NAME
+  cat <<EOF
+Now using ${site_name}:
+URL: ${site_url}
+Location: $(jq -r .location <<<"$site")
+Support contact: $(jq -r .user_support_contact <<<"$site")
+EOF
+}
+export -f use_site
+
 # lease_list_floating_ips LEASE
 #
 # Lists the public floating IP addresses tied to a lease, if any.
