@@ -1,2 +1,2 @@
 # ChameleonCloud-provided
-jupyterhub-chameleon~=1.7.5
+jupyterhub-chameleon~=1.7.6
