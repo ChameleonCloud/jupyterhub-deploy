@@ -110,7 +110,6 @@ if [[ "$NOTEBOOK_ONLY" == "1" ]]; then
     --net "$DOCKER_NETWORK_NAME" \
 		--publish 8888:8888 \
 		--user root \
-    --env NOTEBOOK_PASSWORD="$NOTEBOOK_PASSWORD" \
 		--mount "type=volume,src=jupyter-work,target=/work" \
 		--workdir "/work")
   if [[ -n "$NOTEBOOK_EXTENSION" ]]; then
