@@ -48,6 +48,8 @@ RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstac
 #
 
 RUN python3 -m bash_kernel.install
+# FIXME(jason): this should not be necessary, it should automatically be enabled on install.
+RUN jupyter serverextension enable jupyterlab_chameleon
 
 #
 # Notebook start hooks
