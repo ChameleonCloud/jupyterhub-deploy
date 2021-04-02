@@ -1,8 +1,8 @@
 # Python 3.8
-# Notebook 6.0.3
-# JupyterLab 2.1.4
-# JupyterHub 1.1.0
-FROM jupyter/minimal-notebook:5197709e9f23
+# Notebook 6.2.0
+# JupyterLab 3.0.12
+# JupyterHub 1.3.0
+FROM jupyter/minimal-notebook:4d9c9bd9ced0
 
 USER root
 
@@ -11,15 +11,15 @@ USER root
 #
 
 RUN apt-get update \
-    && apt-get install -yq --no-install-recommends \
-         curl dnsutils jq moreutils openjdk-8-jre vim zip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+  && apt-get install -yq --no-install-recommends \
+  curl dnsutils jq moreutils openjdk-8-jre vim zip \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN curl -Lo /tmp/xoStitch.deb \
-      https://github.com/ChameleonCloud/xo-stitch/releases/download/v0.2/xoStitch-v0.2.deb \
-    && dpkg -i /tmp/xoStitch.deb \
-    && rm -f /tmp/xoStitch.deb
+  https://github.com/ChameleonCloud/xo-stitch/releases/download/v0.2/xoStitch-v0.2.deb \
+  && dpkg -i /tmp/xoStitch.deb \
+  && rm -f /tmp/xoStitch.deb
 
 #
 # JupyterLab extensions
@@ -29,11 +29,7 @@ RUN curl -Lo /tmp/xoStitch.deb \
 # need to be updated.
 #
 
-RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager@2.0
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-theme-extension@2.0.0
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab_swift@2.0.2
-RUN jupyter labextension install --no-build @chameleoncloud/jupyterlab-chameleon@1.2.0
-RUN jupyter lab build
+# RUN jupyter labextension install @chameleoncloud/jupyterlab-theme-extension@2.0.0
 
 #
 # Notebook dependencies
@@ -52,17 +48,16 @@ RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstac
 #
 
 RUN python3 -m bash_kernel.install
-RUN jupyter nbextension enable --py widgetsnbextension
 
 #
 # Notebook start hooks
 #
 
 RUN apt-get update \
-    && apt-get install -yq --no-install-recommends \
-         openssh-client rsync \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+  && apt-get install -yq --no-install-recommends \
+  openssh-client rsync \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 COPY start-notebook.d/* /usr/local/bin/start-notebook.d/
 COPY before-notebook.d/* /usr/local/bin/before-notebook.d/
 # Everything in serverroot gets copied to the user's working directory on start

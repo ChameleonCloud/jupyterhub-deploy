@@ -3,7 +3,7 @@ FROM $base_image as base
 
 RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
-        libmariadbclient-dev \
+    libmariadbclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base as builder
@@ -13,17 +13,16 @@ RUN python3 -m pip install --upgrade setuptools wheel
 
 RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
-         build-essential \
-         git-core \
-         python3-dev \
+    build-essential \
+    git-core \
+    python3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip wheel --wheel-dir wheelhouse \
-      mysqlclient \
-      netifaces \
-      jupyterhub-keystoneauthenticator~=0.2.6 \
-      git+https://github.com/chameleoncloud/dockerspawner.git@volume-drivers#egg=dockerspawner
+    mysqlclient \
+    netifaces \
+    git+https://github.com/chameleoncloud/dockerspawner.git@volume-drivers#egg=dockerspawner
 
 FROM base as release
 
@@ -51,7 +50,7 @@ FROM release as dev
 # File watcher for running tests on watch mode
 RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
-        build-essential git-core \
+    build-essential git-core \
     && rm -rf /var/lib/apt/lists/* \
     && git clone https://github.com/eradman/entr /opt/entr \
     && cd /opt/entr \

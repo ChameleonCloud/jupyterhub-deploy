@@ -9,8 +9,7 @@ if [[ -f .env ]]; then
   set -a; source .env; set +a
 fi
 
-start-notebook.sh --app-dir=/home/jovyan/.jupyter/lab \
-  --NotebookApp.password="$NOTEBOOK_PASSWORD" \
-  --NotebookApp.tornado_settings={\'autoreload\':True} \
-  --watch \
+start-notebook.sh \
+  --ServerApp.password_required=False \
+  --ServerApp.tornado_settings autoreload=True \
   "$@"
