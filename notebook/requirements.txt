@@ -30,4 +30,4 @@ git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/
 git+https://github.com/ChameleonCloud/python-heatclient@stable/rocky#egg=python-heatclient
 
 # ChameleonCloud-provided
-python-chi~=0.8.0
+python-chi~=0.10.0
