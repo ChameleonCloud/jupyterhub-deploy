@@ -5,6 +5,7 @@ tqdm~=4.0
 
 # IPython kernels
 bash_kernel
+xonsh
 
 # Commonly-used libraries
 ansible~=2.0
