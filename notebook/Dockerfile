@@ -2,7 +2,7 @@
 # Notebook 6.2.0
 # JupyterLab 3.0.12
 # JupyterHub 1.3.0
-FROM jupyter/minimal-notebook:4d9c9bd9ced0
+FROM jupyter/minimal-notebook:4d9c9bd9ced0 as base
 
 USER root
 
@@ -40,7 +40,7 @@ COPY requirements.txt /tmp/notebook-requirements.txt
 
 ARG openstack_release=train
 RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstack/requirements/stable/${openstack_release}/upper-constraints.txt" \
-  && python3 -m pip install --no-cache -r /tmp/notebook-requirements.txt \
+  && python3 -m pip install --no-cache -r /tmp/notebook-requirements.txt -c /upper-constraints.txt \
   && rm -f /tmp/notebook-requirements.txt
 
 #
@@ -49,6 +49,20 @@ RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstac
 
 RUN python3 -m bash_kernel.install
 RUN xonsh -c "xonfig jupyter-kernel"
+
+USER $NB_USER
+
+FROM base as chameleon
+
+USER root
+
+COPY chi-requirements.txt /tmp/chi-requirements.txt
+
+ARG openstack_release=train
+RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstack/requirements/stable/${openstack_release}/upper-constraints.txt" \
+  && python3 -m pip install --no-cache -r /tmp/chi-requirements.txt -c /upper-constraints.txt \
+  && rm -f /tmp/chi-requirements.txt /upper-constraints.txt
+
 # FIXME(jason): this should not be necessary, it should automatically be enabled on install.
 RUN jupyter serverextension enable jupyterlab_chameleon
 

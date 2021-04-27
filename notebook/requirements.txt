@@ -1,6 +1,5 @@
 # JupyterLab extensions
 ipywidgets~=7.5
-jupyterlab_chameleon~=2.0.4
 tqdm~=4.0
 
 # IPython kernels
@@ -14,21 +13,3 @@ numpy~=1.15
 pandas~=1.0.0
 scipy~=1.4
 seaborn~=0.10.0
-
-# OpenStack clients
-gnocchiclient
-keystoneauth1
-python-cinderclient
-python-glanceclient
-python-ironicclient
-python-keystoneclient
-python-neutronclient
-python-novaclient
-python-openstackclient
-python-swiftclient
-# Forked clients
-git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/train#egg=python-blazarclient
-git+https://github.com/ChameleonCloud/python-heatclient@stable/rocky#egg=python-heatclient
-
-# ChameleonCloud-provided
-python-chi~=0.10.0
