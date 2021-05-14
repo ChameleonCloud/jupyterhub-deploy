@@ -9,9 +9,6 @@ python-neutronclient
 python-novaclient
 python-openstackclient
 python-swiftclient
-# Forked clients
-git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/train#egg=python-blazarclient
-git+https://github.com/ChameleonCloud/python-heatclient@stable/rocky#egg=python-heatclient
 
 # ChameleonCloud-provided
 jupyterlab_chameleon~=2.0.4

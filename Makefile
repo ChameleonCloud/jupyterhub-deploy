@@ -19,12 +19,6 @@ hub-publish:
 		         $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
 	docker push $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
 
-.PHONY: hub-publish-latest
-hub-publish-latest:
-	docker tag $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) \
-				$(REGISTRY)/$(JUPYTERHUB_IMAGE):latest
-	docker push $(REGISTRY)/$(JUPYTERHUB_IMAGE):latest
-
 # Notebook server targets
 
 .PHONY: notebook-build
@@ -39,8 +33,7 @@ notebook-publish:
 		         $(REGISTRY)/$(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION)
 	docker push $(REGISTRY)/$(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION)
 
-.PHONY: notebook-publish-latest
-notebook-publish-latest:
-	docker tag $(REGISTRY)/$(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) \
-				$(REGISTRY)/$(NOTEBOOK_IMAGE):latest
-	docker push $(REGISTRY)/$(NOTEBOOK_IMAGE):latest
+.PHONY: notebook-publish-base
+notebook-publish-base:
+	docker build --target base -t $(REGISTRY)/$(NOTEBOOK_IMAGE):base notebook
+	docker push $(REGISTRY)/$(NOTEBOOK_IMAGE):base

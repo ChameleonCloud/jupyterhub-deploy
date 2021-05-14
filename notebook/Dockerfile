@@ -39,29 +39,37 @@ RUN curl -Lo /tmp/xoStitch.deb \
 COPY requirements.txt /tmp/notebook-requirements.txt
 
 ARG openstack_release=train
-RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstack/requirements/stable/${openstack_release}/upper-constraints.txt" \
-  && python3 -m pip install --no-cache -r /tmp/notebook-requirements.txt -c /upper-constraints.txt \
+RUN python3 -m pip install --no-cache -r /tmp/notebook-requirements.txt \
   && rm -f /tmp/notebook-requirements.txt
 
 #
 # Enable server extensions
 #
 
+USER $NB_USER
+
 RUN python3 -m bash_kernel.install
 RUN xonsh -c "xonfig jupyter-kernel"
-
-USER $NB_USER
 
 FROM base as chameleon
 
 USER root
+
+RUN apt-get update \
+  && apt-get install -yq --no-install-recommends \
+  python3-dev libffi-dev \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY chi-requirements.txt /tmp/chi-requirements.txt
 
 ARG openstack_release=train
 RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstack/requirements/stable/${openstack_release}/upper-constraints.txt" \
   && python3 -m pip install --no-cache -r /tmp/chi-requirements.txt -c /upper-constraints.txt \
-  && rm -f /tmp/chi-requirements.txt /upper-constraints.txt
+  && rm -f /tmp/chi-requirements.txt /upper-constraints.txt \
+  && python3 -m pip install --no-cache \
+  git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/train#egg=python-blazarclient \
+  git+https://github.com/ChameleonCloud/python-heatclient@stable/rocky#egg=python-heatclient
 
 # FIXME(jason): this should not be necessary, it should automatically be enabled on install.
 RUN jupyter serverextension enable jupyterlab_chameleon
