@@ -30,7 +30,7 @@ if c.ChameleonSpawner.debug:
     c.ChameleonSpawner.cmd = [
         "start-notebook.sh",
         "--LabApp.watch=True",
-        "--NotebookApp.tornado_settings={\'autoreload\':True}",
+        "--autoreload",
     ]
 
 ##################
