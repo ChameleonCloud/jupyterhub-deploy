@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
 # Set up the SSH agent
-eval $(ssh-agent)
-ssh-add "/work/.ssh/id_rsa"
+if [[ -z "$SSH_AGENT_SOCK" ]]; then
+  eval $(ssh-agent)
+  ssh-add "/work/.ssh/id_rsa"
+fi
