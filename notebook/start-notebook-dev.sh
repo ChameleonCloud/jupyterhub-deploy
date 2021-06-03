@@ -11,5 +11,5 @@ fi
 
 start-notebook.sh \
   --ServerApp.password_required=False \
-  --ServerApp.tornado_settings autoreload=True \
+  --autoreload \
   "$@"

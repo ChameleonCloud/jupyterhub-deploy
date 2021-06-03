@@ -107,6 +107,7 @@ pushd "$DIR" >/dev/null
 
 if [[ "$NOTEBOOK_ONLY" == "1" ]]; then
   declare -a run_cmd=(docker run --rm --interactive --tty \
+    --name notebook \
     --net "$DOCKER_NETWORK_NAME" \
 		--publish 8888:8888 \
 		--user root \

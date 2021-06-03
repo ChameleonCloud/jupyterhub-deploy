@@ -2,7 +2,6 @@
 if [[ -d /ext ]]; then
   pushd /ext 2>/dev/null
 
-  app_dir="/home/jovyan/.jupyter/lab"
   err_log=jupyter-extension-error.log
 
   # Install Python extension code
@@ -30,16 +29,10 @@ if [[ -d /ext ]]; then
 
   # Install JS extension code
   if [[ -f package.json ]]; then
-    jupyter labextension list --app-dir="$app_dir" 2>/dev/null | grep -q /ext || {
-      # Ensure Typescript has been compiled
-      npm run build
-      jupyter labextension link --app-dir="$app_dir" .
-    }
-    # For some reason, LabApp traitlet overrides passed to jupyterhub-singleuser
-    # over the CLI don't seem to stick. This env variable though will affect
-    # the app directory it uses on boot, which is what we want.
-    export JUPYTERLAB_DIR="$app_dir"
+    jupyter labextension develop . --overwrite
   fi
 
   popd 2>/dev/null
+
+  fix-permissions "$CONDA_DIR/share"
 fi
