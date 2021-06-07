@@ -112,7 +112,8 @@ export -f lease_list_reservations
 #   key_pair_upload my-keypair
 #
 key_pair_upload() {
-  local keypair_name="${1:-$USER-jupyter}"
+  local default_name="${OS_KEYPAIR_NAME:-$USER-jupyter}"
+  local keypair_name="${1:-$default_name}"
 
   openstack keypair show "$keypair_name" 2>/dev/null \
     || openstack keypair create --public-key "/work/.ssh/id_rsa.pub" "$keypair_name"
