@@ -103,20 +103,26 @@ export -f lease_list_reservations
 
 # key_pair_upload [KEYPAIR_NAME]
 #
-# Uploads the public key at ~/.ssh/id_rsa.pub as a new key pair titled
+# Uploads the public key at $OS_KEYPAIR_PUBLIC_KEY as a new key pair titled
 # KEYPAIR_NAME. Will first check if a key pair already exists with this name.
 # Will not override existing key pairs.
 #
 # Example:
-#   # Creates a new key pair 'my-keypair' with public key from ~/.ssh/id_rsa.pub
+#   # Creates a new key pair 'my-keypair' with public key
 #   key_pair_upload my-keypair
 #
 key_pair_upload() {
   local default_name="${OS_KEYPAIR_NAME:-$USER-jupyter}"
   local keypair_name="${1:-$default_name}"
+  local pubkey="${OS_KEYPAIR_PUBLIC_KEY:-/work/.ssh/id_rsa.pub}"
+  local privkey="${OS_KEYPAIR_PRIVATE_KEY:-/work/.ssh/id_rsa}"
+
+  if [[ ! -f "$pubkey" ]]; then
+    ssh-keygen -y -f "$privkey" >"$pubkey"
+  fi
 
   openstack keypair show "$keypair_name" 2>/dev/null \
-    || openstack keypair create --public-key "/work/.ssh/id_rsa.pub" "$keypair_name"
+    || openstack keypair create --public-key "$pubkey" "$keypair_name"
 }
 export -f key_pair_upload
 
