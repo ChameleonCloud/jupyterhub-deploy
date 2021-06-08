@@ -4,12 +4,13 @@ tqdm~=4.0
 
 # IPython kernels
 bash_kernel
-xonsh
 
 # Commonly-used libraries
 ansible~=2.0
+jupyterplot~=0.0.3
 matplotlib~=3.0
 numpy~=1.15
 pandas~=1.0.0
+paho-mqtt~=1.5.1
 scipy~=1.4
 seaborn~=0.10.0

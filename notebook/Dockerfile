@@ -49,7 +49,6 @@ RUN python3 -m pip install --no-cache -r /tmp/notebook-requirements.txt \
 USER $NB_USER
 
 RUN python3 -m bash_kernel.install
-RUN xonsh -c "xonfig jupyter-kernel"
 
 FROM base as chameleon
 
