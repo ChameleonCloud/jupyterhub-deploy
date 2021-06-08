@@ -14,3 +14,6 @@ pandas~=1.0.0
 paho-mqtt~=1.5.1
 scipy~=1.4
 seaborn~=0.10.0
+
+# For IPython tab-completion
+pyreadline
