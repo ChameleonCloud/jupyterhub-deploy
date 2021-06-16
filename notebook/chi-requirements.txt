@@ -12,4 +12,4 @@ python-swiftclient
 
 # ChameleonCloud-provided
 jupyterlab_chameleon~=2.0.4
-python-chi~=0.11.3
+python-chi~=0.11.4
