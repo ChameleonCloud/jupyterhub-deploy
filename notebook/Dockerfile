@@ -63,12 +63,17 @@ RUN apt-get update \
 COPY chi-requirements.txt /tmp/chi-requirements.txt
 
 ARG openstack_release=train
+# Note: we use several forked clients.
+# blazar: contains many patches for Chameleon
+# heat: contains the "automatic deployment" support
+# zun: because we want the ussuri client for this one, which has support for "requested host"
 RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstack/requirements/stable/${openstack_release}/upper-constraints.txt" \
   && python3 -m pip install --no-cache -r /tmp/chi-requirements.txt -c /upper-constraints.txt \
   && rm -f /tmp/chi-requirements.txt /upper-constraints.txt \
   && python3 -m pip install --no-cache \
   git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/train#egg=python-blazarclient \
-  git+https://github.com/ChameleonCloud/python-heatclient@stable/rocky#egg=python-heatclient
+  git+https://github.com/ChameleonCloud/python-heatclient@stable/rocky#egg=python-heatclient \
+  git+https://github.com/openstack/python-zunclient.git@stable/ussuri#egg=python-zunclient
 
 # FIXME(jason): this should not be necessary, it should automatically be enabled on install.
 RUN jupyter serverextension enable jupyterlab_chameleon
