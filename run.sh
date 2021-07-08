@@ -5,7 +5,7 @@ DIR="$(cd $(dirname ${BASH_SOURCE[0]}) 2>&1 >/dev/null && pwd)"
 NOTEBOOK_ONLY=0
 NOTEBOOK_EXTENSION=
 # Default hub extension otherwise docker-compose.yml mount config is invalid.
-export HUB_EXTENSION=/tmp
+export HUB_EXTENSION=/tmp/hub_extension
 declare -a POSARGS=()
 
 secret_dir="$DIR/secrets"
