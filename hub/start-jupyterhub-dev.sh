@@ -24,8 +24,13 @@ if [[ -d /ext ]]; then
 
   files="$(find /ext \( -path /ext/.git -o -path /ext/.tox -o -path /ext/build \) \
       -prune -false -o -name '*.py' -type f)"
-  echo -e "Watching:\n$files"
-  entr -nr "${cmd[@]}" <<<"$files"
+  if [[ -n "$files" ]]; then
+    echo -e "Watching:\n$files"
+    entr -nr "${cmd[@]}" <<<"$files"
+  else
+    echo "No files to watch."
+    "${cmd[@]}"
+  fi
 else
   "${cmd[@]}"
 fi

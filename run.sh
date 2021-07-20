@@ -4,8 +4,7 @@ DIR="$(cd $(dirname ${BASH_SOURCE[0]}) 2>&1 >/dev/null && pwd)"
 
 NOTEBOOK_ONLY=0
 NOTEBOOK_EXTENSION=
-# Default hub extension otherwise docker-compose.yml mount config is invalid.
-HUB_EXTENSION=/tmp
+HUB_EXTENSION=
 declare -a POSARGS=()
 
 secret_dir="$DIR/secrets"
@@ -54,11 +53,11 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --notebook-extension)
       shift
-      export NOTEBOOK_EXTENSION="$(realpath $1)"
+      NOTEBOOK_EXTENSION="$(realpath $1)"
       ;;
     --hub-extension)
       shift
-      export HUB_EXTENSION="$(realpath $1)"
+      HUB_EXTENSION="$(realpath $1)"
       ;;
     -w|--work-dir)
       shift
@@ -99,6 +98,14 @@ EOF
 fi
 
 set -a; source "$DIR/.env"; set +a
+
+if [[ -n "$HUB_EXTENSION" ]]; then
+  # Default hub extension otherwise docker-compose.yml mount config is invalid.
+  HUB_EXTENSION="$(mktemp -d)"
+fi
+
+export HUB_EXTENSION
+export NOTEBOOK_EXTENSION
 
 docker network inspect "$DOCKER_NETWORK_NAME" >/dev/null \
   || docker network create "$DOCKER_NETWORK_NAME" >/dev/null
