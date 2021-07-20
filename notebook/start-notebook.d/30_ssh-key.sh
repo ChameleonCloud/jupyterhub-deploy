@@ -13,4 +13,5 @@ work_key_file="/work/.ssh/id_rsa"
 if [[ ! -f "$work_key_file" ]]; then
   mkdir -p "$(dirname "$work_key_file")"
   cp "$key_file" "$work_key_file"
+  cp "${key_file}.pub" "${work_key_file}.pub"
 fi
