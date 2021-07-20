@@ -9,6 +9,7 @@ REGISTRY := docker.chameleoncloud.org
 
 .PHONY: hub-build
 hub-build: hub/cull_idle_servers.py
+	wget https://raw.githubusercontent.com/jupyterhub/jupyterhub-idle-culler/master/jupyterhub_idle_culler/__init__.py -O hub/cull_idle_servers.py
 	docker build -t $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) --target release hub
 	# Tag for local development
 	docker build -t $(JUPYTERHUB_IMAGE):dev --target dev hub

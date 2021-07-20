@@ -28,7 +28,7 @@ make notebook-publish
 When upgrading the Hub image, a few things should be done:
 
 1. Check the [JupyterHub changelog](https://jupyterhub.readthedocs.io/en/stable/changelog.html) to see if there are any breaking changes or important things to note.
-2. Check if there are updates to the [`cull_idle_servers.py`](https://github.com/jupyterhub/jupyterhub/blob/master/examples/cull-idle/cull_idle_servers.py) service, which is copied directly from the JupyterHub repo.
+2. Check if there are updates to the [`jupyterhub-idle-culler`](https://github.com/jupyterhub/jupyterhub-idle-culler) service.
 
 **Note**: when releasing new versions, particularly when dependences are updated, it is particularly important to ensure compatibility between the version of JupyterHub built and the version of JupyterLab used in the Notebook image. Ensure the base image for the notebook image (we use the [minimal-notebook](https://github.com/jupyter/docker-stacks/tree/master/minimal-notebook) Docker stack provided by Jupyter) has a matching JupyterHub version.
 
@@ -38,6 +38,7 @@ When upgrading the Hub image, a few things should be done:
 
   - [Docker](https://docs.docker.com/install/)
   - [Docker Compose](https://docs.docker.com/compose/install/)
+  - [wget](http://mirrors.ibiblio.org/gnu/wget/)
 
 ### Quick start
 
