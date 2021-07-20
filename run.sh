@@ -125,5 +125,3 @@ else
   fi
   docker-compose up
 fi
-
-export HUB_EXTENSION
