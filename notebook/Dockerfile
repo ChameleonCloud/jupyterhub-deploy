@@ -73,7 +73,7 @@ RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstac
   && python3 -m pip install --no-cache \
   git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/train#egg=python-blazarclient \
   git+https://github.com/ChameleonCloud/python-heatclient@stable/rocky#egg=python-heatclient \
-  git+https://github.com/openstack/python-zunclient.git@stable/ussuri#egg=python-zunclient
+  git+https://github.com/ChameleonCloud/python-zunclient@chameleoncloud/ussuri#egg=python-zunclient
 
 # FIXME(jason): this should not be necessary, it should automatically be enabled on install.
 RUN jupyter serverextension enable jupyterlab_chameleon
