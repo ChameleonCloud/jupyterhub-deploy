@@ -99,7 +99,7 @@ fi
 
 set -a; source "$DIR/.env"; set +a
 
-if [[ -n "$HUB_EXTENSION" ]]; then
+if [[ -z "$HUB_EXTENSION" ]]; then
   # Default hub extension otherwise docker-compose.yml mount config is invalid.
   HUB_EXTENSION="$(mktemp -d)"
 fi
