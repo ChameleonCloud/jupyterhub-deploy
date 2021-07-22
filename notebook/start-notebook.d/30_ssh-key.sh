@@ -12,6 +12,7 @@ elif grep -q 'BEGIN OPENSSH PRIVATE KEY' "$key_file"; then
   # https://github.com/paramiko/paramiko/issues/602
   # This is a trick to "update" the key file by setting the
   # passphrase to the same value, but it exports as PEM.
+  cp -p "$key_file" "$key_file".bak
   ssh-keygen -p -N "" -m pem -f "$key_file"
 fi
 
