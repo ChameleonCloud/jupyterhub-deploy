@@ -6,10 +6,8 @@ JUPYTERHUB_VERSION = $(shell git log -n1 --format=%h -- hub)
 REGISTRY := docker.chameleoncloud.org
 
 # Hub notebook targets
-
 .PHONY: hub-build
 hub-build: hub/cull_idle_servers.py
-	wget https://raw.githubusercontent.com/jupyterhub/jupyterhub-idle-culler/master/jupyterhub_idle_culler/__init__.py -O hub/cull_idle_servers.py
 	docker build -t $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) --target release hub
 	# Tag for local development
 	docker build -t $(JUPYTERHUB_IMAGE):dev --target dev hub
@@ -19,6 +17,9 @@ hub-publish:
 	docker tag $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) \
 		         $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
 	docker push $(REGISTRY)/$(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION)
+
+hub/cull_idle_servers.py:
+	wget https://raw.githubusercontent.com/jupyterhub/jupyterhub-idle-culler/master/jupyterhub_idle_culler/__init__.py -O hub/cull_idle_servers.py
 
 # Notebook server targets
 
@@ -36,5 +37,5 @@ notebook-publish:
 
 .PHONY: notebook-publish-base
 notebook-publish-base:
-	docker build --target base -t $(REGISTRY)/$(NOTEBOOK_IMAGE):base notebook
+	docker build host --target base -t $(REGISTRY)/$(NOTEBOOK_IMAGE):base notebook
 	docker push $(REGISTRY)/$(NOTEBOOK_IMAGE):base
