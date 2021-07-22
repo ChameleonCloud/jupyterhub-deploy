@@ -37,5 +37,5 @@ notebook-publish:
 
 .PHONY: notebook-publish-base
 notebook-publish-base:
-	docker build host --target base -t $(REGISTRY)/$(NOTEBOOK_IMAGE):base notebook
+	docker build --target base -t $(REGISTRY)/$(NOTEBOOK_IMAGE):base notebook
 	docker push $(REGISTRY)/$(NOTEBOOK_IMAGE):base
