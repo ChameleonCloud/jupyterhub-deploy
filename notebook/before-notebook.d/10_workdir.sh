@@ -81,5 +81,5 @@ fi
 # Our volume mount is at the root directory, link it in to the user's
 # home directory for convenience.
 rm -rf "/home/$NB_USER/work" && ln -s "$workdir" "/home/$NB_USER/work"
-
+chown "$NB_USER:" "/home/$NB_USER/work"
 set +x
