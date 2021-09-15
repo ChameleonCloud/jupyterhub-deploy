@@ -4,6 +4,7 @@ DIR="$(cd $(dirname ${BASH_SOURCE[0]}) 2>&1 >/dev/null && pwd)"
 
 NOTEBOOK_ONLY=0
 NOTEBOOK_EXTENSION=
+NOTEBOOK_ENV=
 HUB_EXTENSION=
 declare -a POSARGS=()
 
@@ -66,6 +67,10 @@ while [[ $# -gt 0 ]]; do
     -n|--notebook-only)
       NOTEBOOK_ONLY=1
       ;;
+    -e|--notebook-env)
+      shift
+      NOTEBOOK_ENV="$(realpath $1)"
+      ;;
     -h|--help)
       usage
       ;;
@@ -116,12 +121,15 @@ if [[ "$NOTEBOOK_ONLY" == "1" ]]; then
   declare -a run_cmd=(docker run --rm --interactive --tty \
     --name notebook \
     --net "$DOCKER_NETWORK_NAME" \
-		--publish 8888:8888 \
-		--user root \
-		--mount "type=volume,src=jupyter-work,target=/work" \
-		--workdir "/work")
+    --publish 8888:8888 \
+    --user root \
+    --mount "type=volume,src=jupyter-work,target=/work" \
+    --workdir "/work")
   if [[ -n "$NOTEBOOK_EXTENSION" ]]; then
     run_cmd+=(--mount "type=bind,src=$NOTEBOOK_EXTENSION,target=/ext")
+  fi
+  if [[ -n "$NOTEBOOK_ENV" ]]; then
+    run_cmd+=(--env-file "$NOTEBOOK_ENV")
   fi
   run_cmd+=("$NOTEBOOK_IMAGE:dev")
   run_cmd+=("${POSARGS[@]:-start-notebook-dev.sh}")
