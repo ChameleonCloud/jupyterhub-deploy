@@ -1,4 +1,4 @@
-ARG base_image=jupyterhub/jupyterhub:1.2
+ARG base_image=jupyterhub/jupyterhub:1.4
 FROM $base_image as base
 
 RUN apt-get update \

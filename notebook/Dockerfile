@@ -1,8 +1,8 @@
-# Python 3.8
-# Notebook 6.2.0
-# JupyterLab 3.0.12
-# JupyterHub 1.3.0
-FROM jupyter/minimal-notebook:4d9c9bd9ced0 as base
+# Python 3.9.6
+# Notebook 6.4.3
+# JupyterLab 3.1.11
+# JupyterHub 1.4.2
+FROM jupyter/minimal-notebook:2021-09-15 as base
 
 USER root
 
@@ -54,9 +54,12 @@ FROM base as chameleon
 
 USER root
 
+# TODO: this is awful and should ideally go away. We should figure out
+# how to install wheels instead of building any packages from source at this
+# stage in the build.
 RUN apt-get update \
   && apt-get install -yq --no-install-recommends \
-  python3-dev libffi-dev \
+  build-essential python3-dev libffi-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 

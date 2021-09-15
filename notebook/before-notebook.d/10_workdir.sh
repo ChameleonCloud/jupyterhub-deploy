@@ -1,14 +1,85 @@
-# Link original home directory to renamed one.
-# This helps `docker exec` continue to work (the container's launch dir
-# is /home/jovyan by default) and is really the only reason we do this.
-if [[ "$NB_USER" != jovyan ]]; then
-  ln -sf "/home/$NB_USER" /home/jovyan
+set -x
+
+workdir=/work
+expdir=/exp
+archivedir=/tmp/_archive
+
+if [[ ! -d "$workdir" ]]; then
+  mkdir -p "$workdir"
 fi
 
-# Fix permissions on entire home directory
-chown -R "$NB_USER:" "/home/$NB_USER"
+# Remove artifacts from mounting remote volume
+rm -rf "$workdir/lost+found"
 
-# The default terminal directory is the directory Jupyter was started
-# from--it makes the most sense for this to equal the notebook_dir, which
-# is ~/work
-cd "/home/$NB_USER/work"
+# Set up Git author config
+git config --global user.name "$NB_USER"
+git config --global user.email "$NB_USER@jupyter.chameleoncloud.org"
+
+git_fetch_latest() {
+  local repo="$1"
+  # Gracefully fail
+  (cd "$repo" && git stash && git pull && git stash pop) || {
+    echo "Failed to pull latest changes from remote"
+  }
+}
+
+git_fetch() {
+  local remote="$1"
+  local checkout="$2"
+
+  if [[ ! -d "$checkout/.git" ]]; then
+    git clone "$remote" $checkout
+  else
+    git_fetch_latest $checkout
+  fi
+}
+
+setup_default_server() {
+  # Copy examples and other "first launch" files over.
+  rsync -aq /etc/jupyter/serverroot/ $workdir/
+  git_fetch https://github.com/chameleoncloud/notebooks.git $workdir/notebooks
+}
+
+setup_experiment_server() {
+  if [[ "${ARTIFACT_DEPOSITION_REPO:-}" == "git" ]]; then
+    git_fetch "$ARTIFACT_DEPOSITION_URL" $workdir
+  else
+    mkdir -p $archivedir
+    wget -P $archivedir "$ARTIFACT_DEPOSITION_URL"
+    archivefile="$archivedir/$(find $archivedir -type f -exec basename {} \; | head -n1)"
+  fi
+  # Deposition URL may contain sensitive information (e.g. creds that are
+  # valid for some TTL.)
+  unset ARTIFACT_DEPOSITION_URL
+
+  pushd $workdir
+
+  if [[ -n "${archivefile:-}" ]]; then
+    unzip -n -d $workdir $archivefile || tar -C $workdir -xf $archivefile \
+      && rm $archivefile || {
+        echo "Failed to extract $archivefile, copying entire file."
+        # Maybe it is not an archive, but a single file. Just copy.
+        cp $archivefile $workdir/
+      }
+  fi
+  if [[ -f requirements.txt ]]; then
+    echo "Installing pip requirements"
+    pip install -r requirements.txt
+  fi
+  popd
+
+  # TODO: use separate experiment directory for named servers?
+  # rm -rf /home/jovyan/exp && ln -s $expdir /home/jovyan/exp
+}
+
+if [[ -n "${ARTIFACT_DEPOSITION_URL}" ]]; then
+  setup_experiment_server
+else
+  setup_default_server
+fi
+
+# Our volume mount is at the root directory, link it in to the user's
+# home directory for convenience.
+rm -rf /home/jovyan/work && ln -s $workdir /home/jovyan/work
+
+set +x
