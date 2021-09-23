@@ -17,3 +17,6 @@ seaborn~=0.10.0
 
 # For IPython tab-completion
 pyreadline
+
+# For installing dev extensions
+jupyter-packaging
