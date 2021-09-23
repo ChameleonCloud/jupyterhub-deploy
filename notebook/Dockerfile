@@ -49,6 +49,7 @@ RUN python3 -m pip install --no-cache -r /tmp/notebook-requirements.txt \
 USER $NB_USER
 
 RUN python3 -m bash_kernel.install
+RUN python3 -m hydra_kernel.install
 
 FROM base as chameleon
 
