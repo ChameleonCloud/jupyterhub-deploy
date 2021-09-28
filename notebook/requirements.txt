@@ -18,5 +18,10 @@ seaborn~=0.10.0
 # For IPython tab-completion
 pyreadline
 
+# FIXME(jason):
+# This shouldn't be necessary once 
+# https://github.com/jupyter/jupyter_client/issues/702 is addressed.
+pyzmq~=22.2.0
+
 # For installing dev extensions
 jupyter-packaging
