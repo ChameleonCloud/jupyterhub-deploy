@@ -70,8 +70,10 @@ ARG openstack_release=train
 # blazar: contains many patches for Chameleon
 # heat: contains the "automatic deployment" support
 # zun: because we want the ussuri client for this one, which has support for "requested host"
+# Note (2): we prune out the pyzmq because it's quite old and messes
+# up various Jupyter frontend clients and their dependencies.
 RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstack/requirements/stable/${openstack_release}/upper-constraints.txt" \
-  && python3 -m pip install --no-cache -r /tmp/chi-requirements.txt -c /upper-constraints.txt \
+  && python3 -m pip install --no-cache -r /tmp/chi-requirements.txt -c <(grep -v pyzmq /upper-constraints.txt) \
   && rm -f /tmp/chi-requirements.txt /upper-constraints.txt \
   && python3 -m pip install --no-cache \
   git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/train#egg=python-blazarclient \
