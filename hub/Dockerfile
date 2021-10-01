@@ -2,9 +2,14 @@ ARG base_image=jupyterhub/jupyterhub:1.4
 FROM $base_image as base
 
 RUN apt-get update \
+    && apt-get remove -yq python3-pycurl \
     && apt-get install -yq --no-install-recommends \
-    libmariadbclient-dev \
+      libmariadbclient-dev \
+      libssl-dev \
+      libcurl4-openssl-dev \
     && rm -rf /var/lib/apt/lists/*
+
+ENV PYCURL_SSL_LIBRARY=openssl
 
 FROM base as builder
 
@@ -22,6 +27,7 @@ RUN apt-get update \
 RUN python3 -m pip wheel --wheel-dir wheelhouse \
     mysqlclient \
     netifaces \
+    pycurl \
     git+https://github.com/chameleoncloud/dockerspawner.git@volume-drivers#egg=dockerspawner
 
 FROM base as release
