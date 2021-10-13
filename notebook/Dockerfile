@@ -1,8 +1,8 @@
-# Python 3.9.6
-# Notebook 6.4.3
-# JupyterLab 3.1.11
+# Python 3.9.7
+# Notebook 6.4.4
+# JupyterLab 3.1.17
 # JupyterHub 1.4.2
-FROM jupyter/minimal-notebook:2021-09-15 as base
+FROM jupyter/minimal-notebook:2021-10-11 as base
 
 USER root
 
