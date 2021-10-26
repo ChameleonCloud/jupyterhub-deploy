@@ -23,6 +23,14 @@ make notebook-publish
 
 **Note**: if you are building these images on a local (development) machine running Mac OS X, you will probably have to increase the amount of RAM available to Docker or risk your builds being mysteriously killed due to hitting memory limits. This can be configured in the Preferences for Docker for Mac; a value of 4G should be high enough.
 
+### ARM64 builds (Apple Silicon)
+
+If you are building images on a M1 Mac or other machine that uses an ARM architecture, you will have to ensure the image is built for x86 architectures, as that's how it is currently run in production. You can do this by leveraging a `BUILD_FLAGS` environment variable, which allows specifying additional flags for `docker build`:
+
+```
+BUILD_FLAGS='--platform linux/amd64' make hub-build
+```
+
 ### Upgrading the Hub image
 
 When upgrading the Hub image, a few things should be done:

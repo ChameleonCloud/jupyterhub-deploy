@@ -11,5 +11,5 @@ python-openstackclient
 python-swiftclient
 
 # ChameleonCloud-provided
-jupyterlab_chameleon~=2.2.3
+jupyterlab_chameleon~=2.2.4
 python-chi~=0.15
