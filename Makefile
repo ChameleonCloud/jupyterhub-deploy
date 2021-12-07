@@ -2,14 +2,15 @@ include .env
 
 NOTEBOOK_VERSION = $(shell git log -n1 --format=%h -- notebook)
 JUPYTERHUB_VERSION = $(shell git log -n1 --format=%h -- hub)
-BUILD_FLAGS ?= 
+BUILD_FLAGS ?=
 
 REGISTRY := docker.chameleoncloud.org
 
 # Hub notebook targets
 .PHONY: hub-build
 hub-build: hub/cull_idle_servers.py
-	docker build $(BUILD_FLAGS) -t $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) --target release hub
+	# Ensure release builds are always built for x86
+	docker build --platform linux/amd64 $(BUILD_FLAGS) -t $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) --target release hub
 	# Tag for local development
 	docker build $(BUILD_FLAGS) -t $(JUPYTERHUB_IMAGE):dev --target dev hub
 
@@ -26,7 +27,8 @@ hub/cull_idle_servers.py:
 
 .PHONY: notebook-build
 notebook-build:
-	docker build $(BUILD_FLAGS) -t $(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) notebook
+	# Ensure release builds are always built for x86
+	docker build --platform linux/amd64 $(BUILD_FLAGS) -t $(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) notebook
 	# Tag for local development
 	docker tag $(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) $(NOTEBOOK_IMAGE):dev
 
