@@ -26,33 +26,25 @@ c = get_config()
 # Most configuration is handled by the jupyterhub-chameleon package
 jupyterhub_chameleon.install_extension(c)
 
-if c.ChameleonSpawner.debug:
-    c.ChameleonSpawner.cmd = [
-        "start-notebook.sh",
-        "--LabApp.watch=True",
-        "--autoreload",
-    ]
-
 ##################
 # Hub
 ##################
 
 # User containers will access hub by container name on the Docker network
-c.JupyterHub.hub_ip = 'jupyterhub'
+c.JupyterHub.hub_ip = "jupyterhub"
 c.JupyterHub.hub_port = 8080
-c.JupyterHub.bind_url = 'http://:8000'
+c.JupyterHub.bind_url = "http://:8000"
 
 # Persist hub data on volume mounted inside container
-data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
+data_dir = os.environ.get("DATA_VOLUME_CONTAINER", "/data")
 
-c.JupyterHub.cookie_secret_file = os.path.join(data_dir,
-    'jupyterhub_cookie_secret')
+c.JupyterHub.cookie_secret_file = os.path.join(data_dir, "jupyterhub_cookie_secret")
 
-c.JupyterHub.db_url = 'mysql+mysqldb://{user}:{password}@{host}/{db}'.format(
-    host=os.environ['MYSQL_HOST'],
-    user=os.environ['MYSQL_USER'],
-    password=os.environ['MYSQL_PASSWORD'],
-    db=os.environ['MYSQL_DATABASE'],
+c.JupyterHub.db_url = "mysql+mysqldb://{user}:{password}@{host}/{db}".format(
+    host=os.environ["MYSQL_HOST"],
+    user=os.environ["MYSQL_USER"],
+    password=os.environ["MYSQL_PASSWORD"],
+    db=os.environ["MYSQL_DATABASE"],
 )
 
 # Whitelist admins.
@@ -60,7 +52,7 @@ c.Authenticator.admin_users = admin = set()
 # Allow admins to manage single-server instances of users.
 c.JupyterHub.admin_access = True
 pwd = os.path.dirname(__file__)
-with open(os.path.join(pwd, 'adminlist')) as f:
+with open(os.path.join(pwd, "adminlist")) as f:
     for line in f:
         if not line:
             continue

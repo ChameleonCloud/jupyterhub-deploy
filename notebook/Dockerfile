@@ -1,8 +1,8 @@
 # Python 3.9.7
 # Notebook 6.4.4
 # JupyterLab 3.1.17
-# JupyterHub 1.4.2
-FROM jupyter/minimal-notebook:2021-10-11 as base
+# JupyterHub 2.0.0
+FROM jupyterhub/singleuser:2.0.0 as base
 
 USER root
 
@@ -10,11 +10,23 @@ USER root
 # Additional packages
 #
 
-RUN apt-get update \
-  && apt-get install -yq --no-install-recommends \
-  curl dnsutils jq moreutils openjdk-8-jre vim zip \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+RUN apt-get update --yes && \
+    apt-get install --yes --no-install-recommends \
+    # Common useful utilities
+    git \
+    nano-tiny \
+    tzdata \
+    unzip \
+    vim-tiny \
+    curl \
+    dnsutils \
+    jq \
+    moreutils \
+    # git-over-ssh
+    openssh-client \
+    # for xoStitch
+    openjdk-8-jre && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN curl -Lo /tmp/xoStitch.deb \
   https://github.com/ChameleonCloud/xo-stitch/releases/download/v0.2/xoStitch-v0.2.deb \
@@ -73,7 +85,7 @@ ARG openstack_release=train
 # Note (2): we prune out the pyzmq because it's quite old and messes
 # up various Jupyter frontend clients and their dependencies.
 RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstack/requirements/stable/${openstack_release}/upper-constraints.txt" \
-  && python3 -m pip install --no-cache -r /tmp/chi-requirements.txt -c <(grep -v pyzmq /upper-constraints.txt) \
+  && python3 -m pip install --no-cache -r /tmp/chi-requirements.txt -c <(grep -v -E 'pyzmq|packaging' /upper-constraints.txt) \
   && rm -f /tmp/chi-requirements.txt /upper-constraints.txt \
   && python3 -m pip install --no-cache \
   git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/train#egg=python-blazarclient \
