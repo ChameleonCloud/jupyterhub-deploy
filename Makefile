@@ -9,10 +9,12 @@ REGISTRY := docker.chameleoncloud.org
 # Hub notebook targets
 .PHONY: hub-build
 hub-build: hub/cull_idle_servers.py
+	docker build $(BUILD_FLAGS) -t $(JUPYTERHUB_IMAGE):dev --target dev hub
+
+.PHONY: hub-build-release
+hub-build-release: hub/cull_idle_servers.py
 	# Ensure release builds are always built for x86
 	docker build --platform linux/amd64 $(BUILD_FLAGS) -t $(JUPYTERHUB_IMAGE):$(JUPYTERHUB_VERSION) --target release hub
-	# Tag for local development
-	docker build $(BUILD_FLAGS) -t $(JUPYTERHUB_IMAGE):dev --target dev hub
 
 .PHONY: hub-publish
 hub-publish:
@@ -27,10 +29,12 @@ hub/cull_idle_servers.py:
 
 .PHONY: notebook-build
 notebook-build:
+	docker build $(BUILD_FLAGS) -t $(NOTEBOOK_IMAGE):dev notebook
+
+.PHONY: notebook-build-release
+notebook-build-release:
 	# Ensure release builds are always built for x86
 	docker build --platform linux/amd64 $(BUILD_FLAGS) -t $(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) notebook
-	# Tag for local development
-	docker tag $(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION) $(NOTEBOOK_IMAGE):dev
 
 .PHONY: notebook-publish
 notebook-publish:
@@ -38,6 +42,7 @@ notebook-publish:
 		         $(REGISTRY)/$(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION)
 	docker push $(REGISTRY)/$(NOTEBOOK_IMAGE):$(NOTEBOOK_VERSION)
 
+# This target is just for the JupyterHub Trovi artifact
 .PHONY: notebook-publish-base
 notebook-publish-base:
 	docker build --target base $(BUILD_FLAGS) -t $(REGISTRY)/$(NOTEBOOK_IMAGE):base notebook

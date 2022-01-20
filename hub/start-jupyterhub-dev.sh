@@ -3,7 +3,8 @@
 declare -a cmd=(jupyterhub)
 if [[ -n "$NOTEBOOK_EXTENSION" ]]; then
   cmd+=(--ChameleonSpawner.extra_volumes={\'$NOTEBOOK_EXTENSION\':\'/ext\'})
-  cmd+=(--ChameleonSpawner.cmd='["start-notebook.sh","--LabApp.watch=True","--autoreload"]')
+  cmd+=(--ChameleonSpawner.args="--LabApp.watch=True")
+  cmd+=(--ChameleonSpawner.args="--autoreload")
 fi
 cmd+=(--ChameleonSpawner.resource_limits=False)
 
@@ -27,7 +28,10 @@ if [[ -d /ext ]]; then
       -prune -false -o -name '*.py' -type f)"
   if [[ -n "$files" ]]; then
     echo -e "Watching:\n$files"
-    entr -nr "${cmd[@]}" <<<"$files"
+    entr -nr "${cmd[@]}" <<<"$files" || {
+      echo "Failed to start watcher!"
+      "${cmd[@]}"
+    }
   else
     echo "No files to watch."
     "${cmd[@]}"

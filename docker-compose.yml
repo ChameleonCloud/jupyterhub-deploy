@@ -17,7 +17,7 @@ services:
     image: ${JUPYTERHUB_IMAGE}:dev
     container_name: jupyterhub
     tty: True
-    #command: start-jupyterhub-dev.sh
+    command: start-jupyterhub-dev.sh
     ports:
       - "8001:8000"
     volumes:
