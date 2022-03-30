@@ -3,7 +3,7 @@
 declare -a cmd=(jupyterhub)
 if [[ -n "$NOTEBOOK_EXTENSION" ]]; then
   cmd+=(--ChameleonSpawner.extra_volumes={\'$NOTEBOOK_EXTENSION\':\'/ext\'})
-  cmd+=(--ChameleonSpawner.args="--LabApp.watch=True")
+  cmd+=(--ChameleonSpawner.args="--NotebookApp.tornado_settings={'autoreload':True}")
   cmd+=(--ChameleonSpawner.args="--autoreload")
 fi
 cmd+=(--ChameleonSpawner.resource_limits=False)
