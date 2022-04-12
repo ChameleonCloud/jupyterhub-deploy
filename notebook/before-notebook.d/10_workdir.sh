@@ -3,6 +3,7 @@ set -x
 workdir=/work
 expdir=/exp
 archivedir=/tmp/_archive
+gittempdir=/tmp/_git_artifact
 
 if [[ ! -d "$workdir" ]]; then
   mkdir -p "$workdir"
@@ -28,7 +29,18 @@ git_fetch() {
   local checkout="$2"
 
   if [[ ! -d "$checkout/.git" ]]; then
-    git clone "$remote" $checkout
+    # Splits the remote into remote@ref. Note we must always ensure to include
+    # an @ here, or the checkout will fail
+    remote_url=${remote%@*}
+    reference=${remote#*@}
+    git clone "$remote_url" $gittempdir
+    pushd $gittempdir
+    git checkout "$reference"
+    popd
+    # Since $workdir is not empty, files need to be copied into it
+    rm -rf $gittempdir/.git
+    cp -r $gittempdir/. $checkout
+    rm -rf $gittempdir
   else
     git_fetch_latest $checkout
   fi
