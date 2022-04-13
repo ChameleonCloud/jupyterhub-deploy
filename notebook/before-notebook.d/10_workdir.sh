@@ -42,15 +42,15 @@ setup_default_server() {
 
 setup_experiment_server() {
   if [[ "${ARTIFACT_DEPOSITION_REPO:-}" == "git" ]]; then
-    git_fetch "$ARTIFACT_DEPOSITION_URL" $workdir
+    git_fetch "$ARTIFACT_CONTENTS_URL" $workdir
   else
     mkdir -p $archivedir
-    wget -P $archivedir "$ARTIFACT_DEPOSITION_URL"
+    wget -P $archivedir "$ARTIFACT_CONTENTS_URL"
     archivefile="$archivedir/$(find $archivedir -type f -exec basename {} \; | head -n1)"
   fi
   # Deposition URL may contain sensitive information (e.g. creds that are
   # valid for some TTL.)
-  unset ARTIFACT_DEPOSITION_URL
+  unset ARTIFACT_CONTENTS_URL
 
   pushd $workdir
 
@@ -72,7 +72,7 @@ setup_experiment_server() {
   # rm -rf /home/jovyan/exp && ln -s $expdir /home/jovyan/exp
 }
 
-if [[ -n "${ARTIFACT_DEPOSITION_URL}" ]]; then
+if [[ -n "${ARTIFACT_CONTENTS_URL}" ]]; then
   setup_experiment_server
 else
   setup_default_server
