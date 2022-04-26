@@ -49,14 +49,14 @@ setup_default_server() {
 }
 
 setup_experiment_server() {
-  if [[ -n "${ARTIFACT_CONTENTS_URL:-}" ]]; then
+  if [[ "${ARTIFACT_CONTENTS_PROTO:-}" == "http" ]]; then
     echo "Downloading via wget"
     mkdir -p $archivedir
     wget -P $archivedir "$ARTIFACT_CONTENTS_URL"
     archivefile="$archivedir/$(find $archivedir -type f -exec basename {} \; | head -n1)"
-  elif [[ "${ARTIFACT_DEPOSITION_REPO:-}" == "git" ]]; then
+  elif [[ "${ARTIFACT_CONTENTS_PROTO:-}" == "git" ]]; then
     echo "Fetching with git"
-    git_fetch "$ARTIFACT_DEPOSITION_URL" $workdir
+    git_fetch "$ARTIFACT_CONTENTS_URL" $workdir
   fi
   # Deposition URL may contain sensitive information (e.g. creds that are
   # valid for some TTL.)
