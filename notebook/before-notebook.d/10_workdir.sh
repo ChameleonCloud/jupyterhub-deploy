@@ -82,7 +82,7 @@ setup_experiment_server() {
   # rm -rf /home/jovyan/exp && ln -s $expdir /home/jovyan/exp
 }
 
-if [[ -n "${ARTIFACT_DEPOSITION_REPO}" ]]; then
+if [[ -n "${ARTIFACT_CONTENTS_URL}" ]]; then
   setup_experiment_server
 else
   setup_default_server
