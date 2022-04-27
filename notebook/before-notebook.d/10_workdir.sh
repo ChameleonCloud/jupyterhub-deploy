@@ -28,7 +28,15 @@ git_fetch() {
   local checkout="$2"
 
   if [[ ! -d "$checkout/.git" ]]; then
-    git clone "$remote" $checkout
+    # Splits the remote into remote@ref. Note we must always ensure to include
+    # an @ here, or the checkout will fail
+    remote_url=${remote%@*}
+    reference=${remote#*@}
+    git clone "$remote_url" $archivedir
+    pushd $archivedir
+    git archive --format=tar "$reference" | tar xf - -C "$checkout"
+    popd
+    rm -rf $archivedir
   else
     git_fetch_latest $checkout
   fi
@@ -41,12 +49,14 @@ setup_default_server() {
 }
 
 setup_experiment_server() {
-  if [[ "${ARTIFACT_DEPOSITION_REPO:-}" == "git" ]]; then
-    git_fetch "$ARTIFACT_CONTENTS_URL" $workdir
-  else
+  if [[ "${ARTIFACT_CONTENTS_PROTO:-}" == "http" ]]; then
+    echo "Downloading via wget"
     mkdir -p $archivedir
     wget -P $archivedir "$ARTIFACT_CONTENTS_URL"
     archivefile="$archivedir/$(find $archivedir -type f -exec basename {} \; | head -n1)"
+  elif [[ "${ARTIFACT_CONTENTS_PROTO:-}" == "git" ]]; then
+    echo "Fetching with git"
+    git_fetch "$ARTIFACT_CONTENTS_URL" $workdir
   fi
   # Deposition URL may contain sensitive information (e.g. creds that are
   # valid for some TTL.)
