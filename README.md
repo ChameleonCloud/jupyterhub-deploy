@@ -9,27 +9,21 @@ There are two images defined, each in its own directory:
 
 ## Releasing new versions
 
-To build and release a new version of either the JupyterHub server or the Notebook image, use the `*-build` and `*-publish` targets. New releases are always tagged with the Git SHA of the latest commit that touched the directory containing the build definitions.
+To build and release a new version of either the JupyterHub server or the Notebook image, use the `*-build-release` and `*-publish` targets. New releases are always tagged with the Git SHA of the latest commit that touched the directory containing the build definitions.
+
+> **Note**: the `-build-release` Make targets are slightly different than the `-build` targets. The main difference is that release builds are built explicitly for x86, as that is the architecture they are deployed on. This is intended to assist in building x86 images when on an ARM machine (e.g., a Mac M1).
 
 ```
 # Publish the JupyterHub image to the Docker registry
-make hub-build
+make hub-build-release
 make hub-publish
 
 # Publish the Notebook image to the Docker registry
-make notebook-build
+make notebook-build-release
 make notebook-publish
 ```
 
 **Note**: if you are building these images on a local (development) machine running Mac OS X, you will probably have to increase the amount of RAM available to Docker or risk your builds being mysteriously killed due to hitting memory limits. This can be configured in the Preferences for Docker for Mac; a value of 4G should be high enough.
-
-### ARM64 builds (Apple Silicon)
-
-If you are building images on a M1 Mac or other machine that uses an ARM architecture, you will have to ensure the image is built for x86 architectures, as that's how it is currently run in production. You can do this by leveraging a `BUILD_FLAGS` environment variable, which allows specifying additional flags for `docker build`:
-
-```
-BUILD_FLAGS='--platform linux/amd64' make hub-build
-```
 
 ### Upgrading the Hub image
 
@@ -38,7 +32,7 @@ When upgrading the Hub image, a few things should be done:
 1. Check the [JupyterHub changelog](https://jupyterhub.readthedocs.io/en/stable/changelog.html) to see if there are any breaking changes or important things to note.
 2. Check if there are updates to the [`jupyterhub-idle-culler`](https://github.com/jupyterhub/jupyterhub-idle-culler) service.
 
-**Note**: when releasing new versions, particularly when dependences are updated, it is particularly important to ensure compatibility between the version of JupyterHub built and the version of JupyterLab used in the Notebook image. Ensure the base image for the notebook image (we use the [minimal-notebook](https://github.com/jupyter/docker-stacks/tree/master/minimal-notebook) Docker stack provided by Jupyter) has a matching JupyterHub version.
+> **Note**: when releasing new versions, particularly when dependences are updated, it is particularly important to ensure compatibility between the version of JupyterHub built and the version of JupyterLab used in the Notebook image. Ensure the base image for the notebook image (we use the [minimal-notebook](https://github.com/jupyter/docker-stacks/tree/master/minimal-notebook) Docker stack provided by Jupyter) has a matching JupyterHub version.
 
 ## Development
 
