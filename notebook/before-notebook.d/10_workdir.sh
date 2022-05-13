@@ -45,7 +45,7 @@ git_fetch() {
 setup_default_server() {
   # Copy examples and other "first launch" files over.
   rsync -aq /etc/jupyter/serverroot/ $workdir/
-  git_fetch https://github.com/chameleoncloud/notebooks.git $workdir/notebooks
+  git_fetch https://github.com/chameleoncloud/notebooks.git@HEAD $workdir/notebooks
 }
 
 setup_experiment_server() {
