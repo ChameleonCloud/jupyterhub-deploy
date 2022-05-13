@@ -34,6 +34,7 @@ git_fetch() {
     reference=${remote#*@}
     git clone "$remote_url" $archivedir
     pushd $archivedir
+    mkdir -p $checkout
     git archive --format=tar "$reference" | tar xf - -C "$checkout"
     popd
     rm -rf $archivedir
