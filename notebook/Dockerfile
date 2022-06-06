@@ -11,22 +11,22 @@ USER root
 #
 
 RUN apt-get update --yes && \
-    apt-get install --yes --no-install-recommends \
-    # Common useful utilities
-    git \
-    nano-tiny \
-    tzdata \
-    unzip \
-    vim-tiny \
-    curl \
-    dnsutils \
-    jq \
-    moreutils \
-    # git-over-ssh
-    openssh-client \
-    # for xoStitch
-    openjdk-8-jre && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+  apt-get install --yes --no-install-recommends \
+  # Common useful utilities
+  git \
+  nano-tiny \
+  tzdata \
+  unzip \
+  vim-tiny \
+  curl \
+  dnsutils \
+  jq \
+  moreutils \
+  # git-over-ssh
+  openssh-client \
+  # for xoStitch
+  openjdk-8-jre && \
+  apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN curl -Lo /tmp/xoStitch.deb \
   https://github.com/ChameleonCloud/xo-stitch/releases/download/v0.2/xoStitch-v0.2.deb \
@@ -50,7 +50,7 @@ RUN curl -Lo /tmp/xoStitch.deb \
 
 COPY requirements.txt /tmp/notebook-requirements.txt
 
-ARG openstack_release=train
+ARG openstack_release=xena
 RUN python3 -m pip install --no-cache -r /tmp/notebook-requirements.txt \
   && rm -f /tmp/notebook-requirements.txt
 
@@ -77,7 +77,7 @@ RUN apt-get update \
 
 COPY chi-requirements.txt /tmp/chi-requirements.txt
 
-ARG openstack_release=train
+ARG openstack_release=xena
 # Note: we use several forked clients.
 # blazar: contains many patches for Chameleon
 # heat: contains the "automatic deployment" support
@@ -88,9 +88,9 @@ RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstac
   && python3 -m pip install --no-cache -r /tmp/chi-requirements.txt -c <(grep -v -E 'pyzmq|packaging' /upper-constraints.txt) \
   && rm -f /tmp/chi-requirements.txt /upper-constraints.txt \
   && python3 -m pip install --no-cache \
-  git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/train#egg=python-blazarclient \
-  git+https://github.com/ChameleonCloud/python-heatclient@stable/rocky#egg=python-heatclient \
-  git+https://github.com/ChameleonCloud/python-zunclient@chameleoncloud/ussuri#egg=python-zunclient
+  git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/xena#egg=python-blazarclient \
+  git+https://github.com/ChameleonCloud/python-heatclient@chameleoncloud/xena#egg=python-heatclient \
+  git+https://github.com/ChameleonCloud/python-zunclient@chameleoncloud/xena#egg=python-zunclient
 
 # FIXME(jason): this should not be necessary, it should automatically be enabled on install.
 RUN jupyter serverextension enable jupyterlab_chameleon
