@@ -88,7 +88,7 @@ RUN curl -Sso /upper-constraints.txt "https://raw.githubusercontent.com/openstac
   && python3 -m pip install --no-cache -r /tmp/chi-requirements.txt -c <(grep -v -E 'pyzmq|packaging' /upper-constraints.txt) \
   && rm -f /tmp/chi-requirements.txt /upper-constraints.txt \
   && python3 -m pip install --no-cache \
-  git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/stable/xena#egg=python-blazarclient \
+  git+https://github.com/ChameleonCloud/python-blazarclient@chameleoncloud/xena#egg=python-blazarclient \
   git+https://github.com/ChameleonCloud/python-heatclient@chameleoncloud/xena#egg=python-heatclient \
   git+https://github.com/ChameleonCloud/python-zunclient@chameleoncloud/xena#egg=python-zunclient
 
