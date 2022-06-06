@@ -59,7 +59,7 @@ setup_experiment_server() {
     echo "Fetching with git"
     git_fetch "$ARTIFACT_CONTENTS_URL" $workdir
   fi
-  # Deposition URL may contain sensitive information (e.g. creds that are
+  # Contents URL may contain sensitive information (e.g. creds that are
   # valid for some TTL.)
   unset ARTIFACT_CONTENTS_URL
 
