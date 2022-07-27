@@ -16,3 +16,12 @@ alias openstack='_with_token openstack'
 alias blazar='_with_token blazar'
 # Users shouldn't really be using this, but they try sometimes.
 alias swift='_with_token swift'
+
+if [[ -n "${OS_PROJECT_NAME+set}" ]]; then
+  # Print project information in bold and blue so that it is noticeable
+  echo -e "Working on project \e[34;1m${OS_PROJECT_NAME}\e[0m."
+  echo -e "To use a different project, set the \e[34;1mOS_PROJECT_NAME\e[0m environment variable."
+else
+  echo -e "\e[31;1mThere is currently no project set! \e[0m"
+  echo -e "\e[1mPlease set the \e[34;1mOS_PROJECT_NAME\e[;1m environment variable.\e[0m"
+fi
