@@ -65,6 +65,9 @@ setup_experiment_server() {
   pushd $workdir
 
   if [[ -n "${archivefile:-}" ]]; then
+    # If we imported an experiment, we'll save the name of its root dir so that
+    # the extension knows about it
+    (zipinfo -1 "${archivefile}" || tar -tf "${archivefile}") | head -n 1 2> /dev/null > "${ARTIFACT_DIR_NAME_FILE}"
     unzip -n -d $workdir $archivefile || tar -C $workdir -xf $archivefile \
       && rm $archivefile || {
         echo "Failed to extract $archivefile, copying entire file."
