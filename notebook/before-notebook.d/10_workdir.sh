@@ -52,8 +52,8 @@ setup_experiment_server() {
   if [[ "${ARTIFACT_CONTENTS_PROTO:-}" == "http" ]]; then
     echo "Downloading via wget"
     mkdir -p $archivedir
-    wget -P $archivedir "$ARTIFACT_CONTENTS_URL"
-    archivefile="$archivedir/$(find $archivedir -type f -exec basename {} \; | head -n1)"
+    wget "$ARTIFACT_CONTENTS_URL" -O "$archivedir/artifact_archive"
+    archivefile="$archivedir/artifact_archive"
   elif [[ "${ARTIFACT_CONTENTS_PROTO:-}" == "git" ]]; then
     echo "Fetching with git"
     git_fetch "$ARTIFACT_CONTENTS_URL" $workdir
