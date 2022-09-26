@@ -74,6 +74,9 @@ setup_experiment_server() {
         # Maybe it is not an archive, but a single file. Just copy.
         cp $archivefile $workdir/
       }
+    if [[ -n "${ARTIFACT_UUID}" && -n "${ARTIFACT_VERSION_SLUG}" ]]; then
+      echo "${ARTIFACT_UUID}:${ARTIFACT_VERSION_SLUG}" > "$workdir/.artifact"
+    fi
   fi
   if [[ -f requirements.txt ]]; then
     echo "Installing pip requirements"
