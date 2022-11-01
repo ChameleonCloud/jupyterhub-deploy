@@ -60,6 +60,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && git clone https://github.com/eradman/entr /opt/entr \
     && cd /opt/entr \
+    && git checkout tags/5.2 \
     && ./configure \
     && make test \
     && make install
